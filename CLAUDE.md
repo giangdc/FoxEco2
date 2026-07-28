@@ -76,10 +76,13 @@
 - **Kết quả:** 8 module (USR, ORD, ASN, DLV, GIFT, CNL, NTF, TS) — 40 requirement, 62 scenario (P1:20 · P2:28 · P3:14), 16 clarification.
 - **Cập nhật 2026-07-24 (bổ sung):** +4 scenario (SC-DLV-012/013/014, SC-GIFT-004) + REQ-GIFT-003, nguồn "Quan sát thực tế app STG" (QA GiangDC2) — ma trận nhãn nút/trạng thái theo vai trò tại màn Theo dõi đơn, xem `test_scenario_map.md` block "Theo dõi đơn — Ma trận nhãn nút theo trạng thái".
 - **Cập nhật 2026-07-24 (bổ sung #3):** +1 clarification **C-USR-03 (Resolved)** — QA xác nhận app STG thật KHÔNG có chức năng cập nhật hồ sơ cá nhân (chỉ view-only), sửa lại scope REQ-USR-002/SC-USR-002.
-- **⚠️ Cập nhật 2026-07-24 (health-check):** chỉ còn **1 clarification BLOCKER cứng cần BA/PO xác nhận trước `/generate-tc`:**
-  1. `C-ORD-02` — Ngưỡng giá trị hàng kích hoạt cảnh báo bảo hiểm (chưa có con số, Open — BLOCKER cho BVA).
-- **3 điểm còn lại đã hạ mức (không còn chặn generate-tc toàn bộ):**
-  - `C-USR-01` — Partially Resolved: có tier text ("Hạng Đồng hành"), không có điểm số ECO/CO2. Vẫn cần hỏi BA cơ chế tính tier trước khi viết BVA cho ngưỡng lên hạng.
-  - `C-DLV-01` — Resolved: Receiver-only (xác nhận qua ảnh Figma DOC-v1.0-04).
-  - `C-GIFT-01` — Partially Resolved: rating tồn tại ở notification, chưa rõ màn thao tác chấm sao — chỉ Blocked riêng cho REQ-GIFT-002, không chặn cả module GIFT.
-- Chi tiết đầy đủ + status mới nhất từng clarification (gồm cả `C-USR-02`, `C-USR-03` mới phát hiện): `02_analyze-requirements/v1.0/MEMORY.md` §6 Clarifications, `risk_assessment.md`.
+- **✅ Cập nhật 2026-07-27 (BA/PO trả lời batch clarifications qua chat):** **Không còn BLOCKER cứng nào.** `C-ORD-02` (ngưỡng giá trị hàng) đã gỡ BLOCKER — BA/PO xác nhận phase này chưa làm, out of scope v1.0. Tổng cộng 13/16 clarification đã Resolved/Deferred:
+  - **Resolved — Out of scope v1.0 (deferred to future phase):** `C-ORD-02` (ngưỡng giá trị hàng), `C-USR-01` (tier "Hạng Đồng hành"), `C-USR-02` (cấu hình kênh liên hệ), `C-GIFT-01` (rating 1-5 sao), `C-TS-01` (Admin Web Portal), `C-CNL-01` (màn Báo sự cố).
+  - **Resolved — rule mới áp dụng ngay ở v1.0:** `C-ORD-01` (validate bắt buộc B1/B2, maxlength TBD), `C-ORD-03` (hạn tin = giá trị user chọn lúc đăng), `C-ORD-04` (không chặn "Thuốc/Y tế" ở v1.0), `C-ASN-01` (SĐT lộ SAU khi ghép — theo BRD), `C-ASN-02` (cấm tự nhận mang giúp đơn của mình), `C-DLV-03` (modal đơn giản là UI chính thức).
+  - **Partially Resolved:** `C-NTF-02` (khớp tuyến = trùng địa chỉ giao + khung giờ phù hợp; còn thiếu định nghĩa độ lệch khung giờ + chu kỳ quét).
+  - **Còn Open thực sự (chưa có câu trả lời):** `C-ORD-05` (biến thể "Mã tin" ở màn Đăng tin thành công), `C-NTF-01` (danh sách 9 loại thông báo chính thức — đã bổ sung bảng unified 3 nguồn để BA chọn, xem `MEMORY.md §6.1`), `C-DLV-02` (default bật/tắt chia sẻ vị trí).
+- Chi tiết đầy đủ + status mới nhất từng clarification: `02_analyze-requirements/v1.0/MEMORY.md` §6/§6.1 Clarifications, `requirement_traceability.md` §2/§3, `risk_assessment.md`.
+- **Cập nhật 2026-07-27 (rescan UI riêng màn Thông báo):** +1 scenario `SC-NTF-007` (empty state danh sách thông báo — chưa có bằng chứng UI, áp dụng lại pattern "Hiện tại chưa có dữ liệu" đã dùng ở SC-ORD-023/SC-GIFT-006, mở rộng `C-ORD-06`).
+- **Cập nhật 2026-07-27 (gap khi review TC-NTF):** +2 scenario `SC-NTF-008` (đánh dấu đã đọc), `SC-NTF-009` (scroll load thêm dữ liệu), +1 clarification `C-NTF-03` (Open).
+- **Cập nhật 2026-07-27 (fix finding health-check):** SC-ORD-015..026 (màn Hoạt động, đã có từ trước trong `test_scenario_map.md`) bị thiếu khỏi `MEMORY.md` §4 Scenario Index — đã sync lại. Tổng: 82 scenario (P1:19 · P2:37 · P3:26).
+- **Cập nhật 2026-07-28 (BA cập nhật BRD lên v3.2):** so với v3.1, chỉ thêm 1 section mới `§D8 Validate & Giá trị mặc định (Form Rules)` — resolve dứt điểm maxlength còn TBD của `C-ORD-01`, hé lộ cơ chế cảnh báo "Giá trị hàng = Cao" (khác ngưỡng số tiền BR-ORD-03 vẫn deferred). +2 requirement, +5 scenario (4 ORD, 1 CNL), 1 scenario modified. Tổng hiện tại: **87 scenario** (P1:20 · P2:39 · P3:28), **43 requirement**.
