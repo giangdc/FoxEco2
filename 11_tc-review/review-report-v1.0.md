@@ -1,143 +1,158 @@
 # TC Review Report — v1.0
 
-> Generated: 2026-07-29
-> Mode: **Direct (fallback)** — `review-agent/AGENT.md` vẫn chưa tồn tại trong `~/.claude/skills/review-tc/` (referenced ở SKILL.md nhưng chưa được tạo) → không gọi được independent reviewer qua Anthropic API. Theo `SKILL.md` Common Edge Cases ("Independent reviewer API fail"), review này chạy Direct mode + **disclaimer** + **score cap 85**.
-> TC-MASTER: `03_test-cases/v1.0/TC-MASTER-v1.0.xlsx` (ISC: `ISC_FoxEco_v1.0_TC_v1_R1.xlsx` — 3 file byte-identical, md5 khớp)
-> Scope: **4 sheet TC** — `Test Cases` (TC_01 Hoạt động, 20 TC), `Test Case 2` (TC_02 Cá nhân, 15 TC), `Test Case 3` (TC_03 Thông báo, 27 TC), `Test Case 4` (TC_04 Đăng tin, 113 TC) — tổng **175 TC** (tăng từ 63 TC / 3 sheet ở lần review trước 2026-07-28, do đã consolidate thêm module Đăng tin + sync round 2026-07-29)
-> Mode generate-tc: `comprehensive` cho cả 4 sheet (Coverage Matrix ×4 đi kèm — `Coverage Matrix`, `Coverage Matrix - Cá nhân`, `Coverage Matrix - Thông báo`, `Coverage Matrix - Đăng tin`)
-> Method: parse bằng openpyxl (`data_only=True/False`) + **LibreOffice headless recalc** (file gốc do openpyxl ghi nên cached formula value bị stale/None — đã recalc để lấy giá trị Testcase ID/RTM/Dashboard thật trước khi chạy check)
-> **Score: 70/100 — CONDITIONAL** (không bị cap, vì raw score < trần 85 của Direct-mode)
+> ## ✅ UPDATE 2026-07-30 — ĐÃ FIX TOÀN BỘ 12 FINDING (2 MAJOR + 10 MINOR)
+> User yêu cầu fix hết. Đã sửa ở **fragment** rồi consolidate lại (đúng flow `generate-tc`), **không sửa tay vào TC-MASTER**.
+> **TC: 321 → 323** (+2 TC đóng gap M1). Verify sau fix: LibreOffice recalc — Dashboard TOTAL **323** · Summary C17 323 · C12 = 9 sheet · High 45 / Medium 187 / Low 91 (=323) · ID liên tục `TC_01.1`→`TC_09.16` (Cá nhân giờ tới `TC_02.17`) · **R1 lại sạch 17/17, 0 finding cơ học** · 9/9 Coverage Matrix có `rowsum == footer == số TC thật` · RTM 41 Req, `SUM(E6:E46)`=357, 1 gap chủ đích `REQ-NTF-002`. 3 file output byte-identical (md5 `02f2a06bba65`).
+>
+> | Finding | Trạng thái | Đã làm gì |
+> |---|---|---|
+> | **M1** `R2-15` | ✅ FIXED | +2 TC vào `TC-CANHAN`: `TC_02.16` (completeness 3 thành phần màn "Quà đã nhận" — trạng thái có dữ liệu) và `TC_02.17` (danh sách lịch sử nhận quà). Cả 2 gắn cảnh báo `⚠ chỉ có bằng chứng văn bản US-D20, chưa có ảnh Figma/app STG → cần vibe-test` (Project_rule §10.1); `TC_02.17` Expected nêu rõ: nếu app KHÔNG có danh sách lịch sử thì TC FAIL và mở clarification với BA. Matrix Cá nhân: `SC-GIFT-003` 3→5 TC, footer 15→17 |
+> | **M2** `R4-10` | ✅ FIXED | Viết lại Remark `TC_03.1/2/3` → `Trần 5 thông báo cho MỖI tin OFFER — OPR-01 / REQ-ASN-005 / SC-ASN-013, BA xác nhận qua chat 2026-07-29`, ghi rõ test data 3/5/6 tin là **giá trị chốt, không phải mock**. Bỏ sạch `N=3 mock`, `C-NTF-02`, `chưa chốt số` |
+> | **m1** `R2-12` | ✅ FIXED | Row `SC-NTF-006` (DEPRECATED) trong `Coverage Matrix - Thông báo` không còn |
+> | **m2** `R2-13` | ✅ FIXED | Chính row đó **đổi thành `SC-ASN-013`** (kèm title/source/technique đúng: `✅ 3 (BVA-min-1 / max / max+1 quanh trần 5)`) — vừa xoá scenario deprecated vừa trả 3 TC về đúng chủ sở hữu, footer ghi rõ "8 NTF còn hiệu lực + SC-ASN-013" |
+> | **m3** `R2-13` | ✅ FIXED | Footer `Coverage Matrix - Trang chủ` 31 → **32** |
+> | **m4** `R2-13` | ✅ FIXED | Tách row gộp `SC-ORD-004/005` → **`SC-ORD-005`** ("Tin tự động Hết hạn…", 2 TC) + note nêu rõ `SC-ORD-004` (Timeline) thuộc matrix Đăng tin. Note `SC-ORD-005` ở matrix Đăng tin: "100% (1/1)" → **"0 TC tại module này — cover tại TC_01 Hoạt động (TC_01.9/TC_01.10)"** |
+> | **m5** `R1-17` | ✅ FIXED | `TC_04.81/82`: `Technique: VAL-02-…` → `Technique: N/A — baseline (derive trực tiếp từ rule VAL-02, BRD v3.2 §D8.3; không thuộc rubric B1–B8)`. Quét lại: **0 tag ngoài B1–B8** |
+> | **m6** `R3-12` | ✅ FIXED | `TC_04.93` Expected bước 1/3 nêu thẳng giá trị: `'Tòa nhà Lô B3, KCX Tân Thuận, Q.7'` và `17:30–18:30 (BRD v3.2 §D8.2)` |
+> | **m7** `R3-12` | ✅ FIXED | `TC_04.106` Expected bước 1 → `Màn hiển thị đúng tin đang mở: tên tin + badge trạng thái 'Đã ghép'` |
+> | **m8** `R4-08` | ✅ FIXED | Viết lại `TC_03.8`/`TC_03.10` **chỉ assert vế thông báo** (title + steps + expected), DOC Source về đúng doc thật (`§D1b US-D09 + §D6` / `§A5 BR-CNF-04 + §D6`), Remark thêm dedupe trỏ `TC_07.16` và `TC_07.8/9/10`. Giữ nguyên vị trí sheet để không xáo ID |
+> | **m9** `R4-10` | ✅ FIXED | Sửa ID trong `CLAUDE.md` + `MASTER-MEMORY §8` + `CHANGELOG`: **4 TC** `TC_08.7` · `TC_08.10` · `TC_08.22` · `TC_08.23` (kèm ghi chú bản cũ trích sai `TC_08.24/25`) |
+> | **m10** `R4-07` | ✅ FIXED | Chuẩn hoá **27 DOC Source** phi-tài-liệu về 1 vocabulary — mọi nhãn giờ đều có (nguồn/ai) + (ngày) + (clarification ID & trạng thái): `QA xác nhận app STG (2026-07-28) · C-ORD-06 Resolved` · `QA đề xuất — Chờ BA/Dev — C-NTF-03 (Open)` · `Chờ BA — C-NTF-01 (Open)` · `BA xác nhận qua chat (2026-07-29)` · `Quan sát thực tế app STG (QA GiangDC2, chat 2026-07-27)` · `DOC-v1.0-01 §D1b (US-D20) + quan sát app STG…`. Quét lại: **0 TC còn nhãn cũ**. Đồng thời sửa 3 TC bị gán sai "Chờ BA bổ sung" dù Remark của chính nó ghi C-ORD-06 **Resolved** |
+>
+> **6 INFO không sửa (có lý do):** i1/i2 là trạng thái đúng của pipeline · i3 (technique tag dạng `EP-…` thay vì `B1-EP-…`) nhất quán 100% toàn project, sửa thì phải sửa 213 ô + đổi convention ở skill → nên chốt ở `generate.md` trước · i4 rubric khoẻ · i5 badge đã có TC riêng nên không mất coverage · i6 hợp lệ.
+>
+> **Score sau fix (ước tính):** 0 Critical · 0 Major · 0 Minor trên 12 finding đã đóng → **~100/100** trước cap; nhưng đây vẫn là **self-review** nên điểm chính thức phải chờ `/review-tc --recheck` (và tốt nhất là sau khi bổ sung `review-agent/AGENT.md` để chạy agent mode thật). Phần dưới là **báo cáo gốc trước khi fix**, giữ nguyên để truy vết.
 
-⚠️ **Disclaimer:** Report này KHÔNG phải kết quả từ independent reviewer agent gọi qua Anthropic API như thiết kế gốc của skill (`review-agent/AGENT.md` chưa tồn tại). Đây là self-review trực tiếp — có rủi ro thiên vị vì cùng phiên đã tham gia sửa TC-MASTER trước đó. Trần điểm Direct-mode là 85, nhưng vì raw score tính ra 70 (< 85) nên **không bị ảnh hưởng bởi cap** — 70 là điểm thật theo checklist.
+---
 
-> ## ✅ Update 2026-07-29 (sau khi fix theo yêu cầu user)
-> User yêu cầu fix toàn bộ findings, **trừ scope màn Chi tiết tin/Huỷ đơn** (QC khác đang phụ trách viết TC riêng). Đã fix trực tiếp trên cả 3 file chính + 4 fragment liên quan (xem `CHANGELOG.md` dòng cuối). Kết quả theo từng finding — xem tag `[FIXED]`/`[SKIPPED — theo yêu cầu user]`/`[NOT FIXED — cần việc khác]` gắn ở từng finding bên dưới.
-> **Score mới (ước tính, chưa chạy lại full re-review):** 3/4 Critical đã fix (round data, RTM formula, orphan RTM row), 1/4 Critical skip theo yêu cầu (CNL); 2/3 Major đã fix (Group value, — R1-04 numbering giữ nguyên làm convention), 1/3 Major còn mở (REQ-NTF-002 OPR-07, cần generate-tc); 1/1 Minor đã fix (Tap→Bấm). Nếu tính CNL + REQ-NTF-002 là "chưa fix nhưng đã có lý do/kế hoạch rõ ràng" (không phải bị bỏ sót), điểm thực chất còn lại tương đương ~91/100 (chỉ còn 1 Major thật sự "treo" + 1 Critical đã chuyển giao ngoài phạm vi review-tc). Khuyến nghị chạy `/review-tc --recheck` sau khi module Chi tiết/Huỷ đơn của QC kia xong để có điểm chính thức.
+> Generated: 2026-07-30
+> Mode: **Direct** (⚠ xem Disclaimer)
+> TC-MASTER: `03_test-cases/v1.0/TC-MASTER-v1.0.xlsx` (ISC: `ISC_FoxEco_v1.0_TC_v1_R1.xlsx`, alias `03_test-cases/TC-MASTER-LATEST.xlsx` — 3 file byte-identical md5 `153980f417df`)
+> Scope: **321 TC / 9 sheet chức năng** (TC_01..TC_09) + 9 sheet Coverage Matrix + 8 sheet chuẩn ISC
+> Mode generate: `comprehensive` (R1-17 + R2-13 + R2-14 enforced) · Part 2 verbatim quoting: enabled (R3-13 enforced)
+> Score: **84/100 — CONDITIONAL** · Quality Gate G1: **PASS** (≥70)
+> Bản review trước (2026-07-29, 175 TC / 4 sheet, score 70→~91 sau fix): `review-report-v1.0-ARCHIVE-2026-07-29-175TC-4sheet.md`
 
-## Context — vì sao chạy review lần này
+## ⚠ Disclaimer — Direct mode
 
-User yêu cầu "cập nhật doc source rồi kiểm tra lại". Đối chiếu `MASTER-MEMORY.md` §8 xác nhận: kể từ lần review trước (2026-07-28, 63 TC/3 sheet, score 85/100), đã có **Update 9** (2026-07-29) — thêm 13 TC Đăng tin, viết lại 3 TC Thông báo (TC_03.1-3), sync file chính ISC lệch khỏi alias, và **fix 42 dòng DOC Source bị gắn nhầm "Quan sát thực tế app"** (phát hiện đây thực ra là câu trả lời BA bị bỏ sót khi quét tài liệu). Review lần này verify lại toàn bộ 4 sheet (không chỉ phần vừa sửa) theo đúng phạm vi FULL mode.
+Skill `review-tc` quy định gọi **independent reviewer agent** qua Anthropic API, đọc system prompt từ `~/.claude/skills/review-tc/review-agent/AGENT.md`. **File này vẫn KHÔNG tồn tại** trong skill đã cài (chỉ có `SKILL.md` + `references/{full,module,recheck}.md`) → không chạy được agent mode. Theo `SKILL.md` ("Independent reviewer API fail → fallback direct + disclaimer"), review này chạy **Direct mode**, tức là **self-review, có bias** vì cùng phiên đã consolidate bộ TC này. Score bị **cap 85**; score tính được là 84 (dưới cap nên không bị điều chỉnh).
 
-**✅ Xác nhận việc sửa DOC Source đã áp dụng đúng và đầy đủ:** quét toàn bộ cột DOC Source (C) của 175 TC — **0 dòng còn nhãn "Quan sát thực tế app" bare** (nhãn mơ hồ cũ). Đã thay bằng 3 nhãn cụ thể theo đúng phân loại: `Chờ BA bổ sung` (11 TC — còn thật sự chờ), `BA xác nhận qua trao đổi (chat), 2026-07-29` (7 TC), `UI nền tảng (scroll-load)` (5 TC). Không tìm thấy sai lệch nào so với mô tả trong `MASTER-MEMORY.md` Update 9 / `CHANGELOG.md`.
+Muốn score độc lập thật: bổ sung `review-agent/AGENT.md` vào skill rồi chạy `/review-tc --recheck`.
+
+## Cách kiểm chứng (không đọc từ MEMORY summary)
+
+- Parse trực tiếp bằng `openpyxl` **2 lần**: `data_only=False` (đối chiếu formula cột A/AM/AN/AO có bị gõ đè) và `data_only=True` trên bản **LibreOffice headless recalc** — file gốc do openpyxl ghi nên không có cached value, đọc thẳng sẽ ra `None` cho mọi Testcase ID.
+- Duyệt **cả 9 sheet TC**, không chỉ sheet đầu; 321/321 row có DOC Source đều được kiểm.
+- Đối chiếu chéo: `MEMORY.md §3/§4/§6/§9`, `test_scenario_map.md` (41 Block Definition + Source Quote), `test_data_catalog.md`, `requirement_traceability.md`, `BRD v3.2 §D8`, sheet `RTM` / `Dashboard` / 9 `Coverage Matrix`.
 
 ## Summary
 
-| Severity | Count (findings, gộp theo root-cause) | Số TC bị ảnh hưởng |
-|----------|------|------|
-| 🔴 CRITICAL | 4 | 17 TC + 9 REQ-liên-quan + 1 sheet metric (RTM) |
-| 🟠 MAJOR | 3 | ~62 TC |
-| 🟡 MINOR | 1 | 7 TC |
-| 🔵 INFO | 2 | — |
-
-> **Phương pháp tính điểm:** mỗi root-cause tính là 1 finding (theo đúng tiền lệ report 2026-07-28), không áp máy móc "mỗi dòng lệch = 1 lỗi độc lập". Cột "Số TC bị ảnh hưởng" để tự quy đổi nếu cần.
-> Score = 100 − (4×5 + 3×3 + 1×1) = 100 − 30 = **70**. Quality Gate G1 (≥70): **PASS (biên giới)**.
+| Severity | Count |
+|----------|-------|
+| 🔴 CRITICAL | **0** |
+| 🟠 MAJOR | **2** |
+| 🟡 MINOR | **10** |
+| 🔵 INFO | 6 |
 
 ## Findings
 
-### 🔴 CRITICAL
+### 🔴 CRITICAL — không có
 
-**[R1-15] [FIXED] Round-1 execution data còn sót lại (leftover mẫu template) — 17 dòng trong `Test Case 3` (Thông báo), CHƯA từng chạy round test nào (pipeline `vibe-test` = NOT_STARTED)**
-
-- **Đây là finding CŨ từ report 2026-07-28 (khi đó ghi nhận 15 TC), VẪN CHƯA ĐƯỢC FIX** — thậm chí sau khi TC_03.1-3 bị viết lại hoàn toàn ở Update 9, 3 TC này vẫn giữ nguyên round data mẫu.
-- 14 TC dính: `TC_03.1, .2, .3, .4, .5, .6, .8, .9, .11, .13, .14, .15, .17, .19` — đều có `N/O/P/Q` (và lặp lại ở `S/T/U/V`, `X/Y/Z/AA`) = `Yes/Pass/Pass/PhucDN7`. Riêng `TC_03.3` còn có `R="IP-104"` (ID bug giả).
-- **Phát hiện MỚI (chưa từng báo cáo):** 3 dòng **Block-label** (cột A rỗng — không phải TC, nên không bị soi ở review TC-level trước đây) cũng dính data y hệt: row 26 (`Block Nội dung thực tế trên UI`), row 28 (`Block Empty state`), row 30 (`Block Đánh dấu đã đọc`). Vì Dashboard tính Pass bằng `COUNTIF(AO range,"Pass")` quét thẳng cả dải (không loại trừ row label), 3 dòng ma này khiến Dashboard báo **17 Pass** trong khi TC thật chỉ có **14 Pass** — sai lệch +3 pass ảo.
-- **Suggest:** xoá sạch N:AL ở cả 17 dòng trên (14 TC + 3 block-label) trước khi chạy `/vibe-test` — nếu không, Dashboard/RTM sẽ báo sai kết quả execution ngay từ ngày đầu.
-
-**[NEW] [FIXED] RTM cột "Đã chạy" (F) dùng công thức `COUNTIFS(...$AO$8:$AO$502,"<>")` — bug kinh điển Excel/LibreOffice: `"<>"` chỉ loại trừ ô THẬT SỰ rỗng, KHÔNG loại trừ ô có công thức trả về chuỗi rỗng `""`**
-
-- Verify độc lập: dựng workbook test tối giản (1 ô công thức trả `""`, 1 ô số, 1 ô rỗng thật) → `COUNTIF(range,"<>")` = 2 (đếm cả ô công thức-rỗng), không phải 1.
-- Vì cột `AO` (Status) của MỌI dòng TC đều có công thức (dù kết quả rỗng khi chưa chạy), formula này **đếm TẤT CẢ TC là "đã chạy"** bất kể có execution thật hay không.
-- Bằng chứng: RTM row "Tổng" báo **Đã chạy = 192/192 (100%)** — trong khi Pipeline Status (`MASTER-MEMORY.md` §8) ghi rõ `vibe-test = NOT_STARTED`, và thực tế chỉ có 14 TC (contaminated, xem finding trên) có giá trị AO. Metric "% phủ chạy" của RTM/Dashboard hiện **vô nghĩa — luôn hiển thị ~100% bất kể trạng thái thật**.
-- **Escalate từ report 2026-07-28:** hiện tượng này ĐÃ được ghi nhận ở report trước (Info #2), nhưng khi đó bị đánh giá là "có thể do LibreOffice xử lý khác Excel thật, cần double-check". Lần này đã dựng workbook test độc lập tối giản và xác nhận: đây là **hành vi chuẩn của cả Excel lẫn LibreOffice** (không phải quirk riêng của công cụ verify), nên nâng cấp từ Info (không trừ điểm) → **Critical** (trừ điểm).
-- **Suggest:** đổi tiêu chí COUNTIFS sang `"Pass"` OR `"Fail"` (giá trị cụ thể) thay vì `"<>"`, ví dụ `COUNTIFS(range,"Pass")+COUNTIFS(range,"Fail")`. Nên đưa fix này vào `generate-tc/references/consolidate.md` để áp dụng cho các version/project sau (không chỉ sửa file này).
-
-**[R2-01] [SKIPPED — theo yêu cầu user] Module "Huỷ đơn" (REQ-CNL-001) — 3 scenario P1/P2 hoàn toàn CHƯA có TC nào**
-
-> User xác nhận: màn Chi tiết tin + Huỷ đơn đang có 1 QC khác phụ trách viết TC riêng — bỏ qua finding này, không cần fix trong phạm vi review-tc. Giữ nguyên trong report để làm hồ sơ bàn giao/theo dõi.
-
-- `SC-CNL-001` (popup bắt buộc lý do, P1), `SC-CNL-003` (ghi actor + đồng bộ realtime 3 bên, P2), `SC-CNL-005` (lý do tối thiểu 5 ký tự — VAL-04, BRD v3.2, P2) — cả 3 đều `NEW`, 0 TC trong toàn bộ TC-MASTER.
-- RTM báo `REQ-CNL-001` có "1 TC" — nhưng TC đó (`TC_01.20`, nằm ở sheet Hoạt động) thực ra test hành vi KHÁC hẳn ("đơn Đã huỷ không hiển thị ở tab Hoạt động"), và ngay trong Step của chính nó ghi "*(xem TC huỷ đơn module CNL)*" — ngụ ý có 1 bộ TC CNL riêng, nhưng bộ đó **không tồn tại** ở bất kỳ đâu trong TC-MASTER.
-- Toàn bộ luồng cốt lõi "bấm Huỷ đơn → bắt buộc nhập lý do → validate độ dài → xác nhận → đồng bộ 3 bên" **chưa được test dòng nào**.
-
-**[R2-16] [FIXED] 2 Req ID xuất hiện trong TC (cột B) nhưng KHÔNG có row trong RTM — orphan traceability**
-
-- `REQ-ASN-005` (3 TC: `TC_03.1/.2/.3`, module Thông báo — nguồn từ update reassign 2026-07-29) và `REQ-ORD-014` (6 TC: `TC_04.29/.30/.31/.60/.61/.62`, module Đăng tin — autocomplete địa chỉ) đều **không có row nào trong sheet `RTM`**.
-- Hệ quả: 9 TC này hoàn toàn "vô hình" với người đọc RTM — RTM Tổng (Số TC=192) không phản ánh đúng bức tranh coverage theo Req ID cho 2 requirement này. Đã verify formula COUNTIF của 21 Req ID hiện có trong RTM là ĐÚNG (không thiếu term sheet nào — check R2-16 phần "formula thiếu term" pass), vấn đề chỉ là **thiếu hẳn 2 row**.
-- **Suggest:** `/generate-tc --consolidate` lại để RTM tự thêm đủ row cho `REQ-ASN-005`/`REQ-ORD-014` (nhớ theo đúng quy trình unmerge trước khi insert_rows — xem lưu ý đã ghi ở `MASTER-MEMORY.md` Update 6/8).
+R1 Structural Integrity **sạch 17/17 check** — chi tiết ở §Version-Specific Checks.
 
 ### 🟠 MAJOR
 
-**[R1-04] [NO_CHANGE — chấp nhận làm convention] Steps đánh số 1..N nhưng Expected chỉ ghi số N (không đủ 1:1 theo từng step) — 57/175 TC (~33%), trải trên cả 3 sheet cũ (Hoạt động/Cá nhân/Thông báo); sheet Đăng tin (TC_04, mới nhất) KHÔNG dính lỗi này**
+#### M1 · `R2-15` — Field/Column completeness gap: "Danh sách lịch sử" màn "Quà đã nhận" chưa có TC nào
+- **Sheet/TC:** `Test Case 2` (TC_02 Cá nhân) — thiếu TC
+- **Nguồn:** `test_scenario_map.md` → Block Definition `GIFT / Cá nhân (mục Quà đã nhận) / Quà đã nhận (màn riêng)` — 4 thành phần: (1) Icon quay lại, (2) Card đếm số, (3) **Danh sách lịch sử**, (4) Empty state. Source Quote #1 (US-D20, verbatim): *"tôi muốn xem tổng hợp 'Quà đã nhận' (**đếm theo loại + lịch sử**)"*.
+- **Issue:** TC hiện có chỉ phủ 3/4 thành phần — TC_02.15 (icon quay lại), TC_02.12/13/14 (card đếm số), TC_02.11 (empty state). **Thành phần "Danh sách lịch sử" = 0 TC**, và KHÔNG có TC completeness nào liệt kê đủ 4 thành phần của màn này (TC_02.3 là completeness cho *header màn Cá nhân*, khác màn).
+- **Suggestion:** bổ sung 2 TC vào `fragments/TC-CANHAN-v1.0.xlsx` — (a) `Check đầy đủ + đúng 4 thành phần hiển thị tại màn "Quà đã nhận"` (Group=UI), (b) `Check danh sách lịch sử nhận quà hiển thị đúng ...` — rồi `/generate-tc --sync`. Nếu "lịch sử" thực tế KHÔNG có trên UI STG thì phải mở clarification + ghi Analyst Note, không im lặng bỏ qua.
 
-> Quyết định: KHÔNG rewrite 57 TC (effort lớn, giá trị thấp — không gây mơ hồ khi test thật). Chấp nhận pattern "step setup/navigate không cần expected riêng, chỉ step quan sát cuối có" làm convention chính thức, đúng như khuyến nghị (a) đã nêu trong report gốc.
-
-- Ví dụ: `TC_01.1` Steps `1./2./3.` nhưng Expected chỉ có `3.` (step 1-2 là setup/navigate, không có expected riêng).
-- Đây là pattern **giống hệt** finding Major đã ghi nhận ở report 2026-07-28 ("48/63 TC lệch rule 1:1") — nay lan rộng theo tỷ lệ tương tự sang TC_02/TC_03, nhưng KHÔNG xuất hiện ở TC_04 (module mới nhất, viết đúng chuẩn 1:1) → cho thấy quy tắc ĐÃ được áp dụng đúng ở lần generate gần nhất, chỉ còn tồn đọng ở 3 sheet cũ chưa được rà lại.
-- Không gây mơ hồ khi test (step cuối luôn có expected), nhưng lệch rule literal của `generate.md`.
-
-**[R1-11] [FIXED] Cột Group (D) chứa giá trị `"Business Rule"` — không thuộc 4 giá trị dropdown hợp lệ (`Functional`/`UI`/`Integration`/`Database Test Case`)**
-
-- 5 TC: `TC_03.1, TC_03.2, TC_03.3` (Thông báo), `TC_04.31, TC_04.62` (Đăng tin).
-- Nhiều khả năng giá trị cột "Type" của scenario map (`test_scenario_map.md` ghi các scenario này là loại "Business Rule") bị copy nhầm vào cột Group của TC thay vì chọn đúng dropdown (nhiều khả năng đúng ra là `Functional`).
-
-**[R2-01] [NOT FIXED — cần chạy generate-tc/analyze-requirements riêng] `REQ-NTF-002` (phần OPR-07 "lộ liên hệ có kiểm soát") — 0 TC, dù sub-scope này vẫn active**
-
-> Không phải fix cơ học (không có sẵn scenario cho OPR-07 để derive TC) — cần rà lại `analyze-requirements` để xác nhận/viết scenario riêng cho OPR-07 trước khi `generate-tc` có thể sinh TC. Để lại làm việc tồn đọng.
-
-- RTM: `REQ-NTF-002` Số TC = 0. Đã xác minh qua `MEMORY.md` §6.1/header #12: phần OPR-06 (trần/ngày) đã chính thức DEPRECATED (BA xác nhận không tồn tại), nhưng phần **OPR-07 (lộ liên hệ có kiểm soát) không bị ảnh hưởng bởi update này, vẫn giữ nguyên** — tức vẫn còn scope cần test nhưng generate-tc chưa derive TC nào cho nó (có thể do chưa có scenario riêng cho OPR-07 trong `test_scenario_map.md` — gợi ý nên rà lại ở `analyze-requirements` trước khi generate tiếp).
+#### M2 · `R4-10` — Remark của TC_03.1/2/3 mâu thuẫn chính nội dung TC và trái Version MEMORY
+- **Sheet/TC:** `Test Case 3` — `TC_03.1`, `TC_03.2`, `TC_03.3` · field **AP (Remark)**
+- **Issue:** Title/Pre-condition/Steps/Expected của 3 TC đã viết theo **trần 5 thông báo / 1 tin** (rule BA đã chốt: `OPR-01` → `REQ-ASN-005` → `SC-ASN-013`, xem `MEMORY.md` bổ sung #11 và #12 ngày 2026-07-29). Nhưng Remark vẫn là bản cũ:
+  - TC_03.1 — `Technique: BVA-min-1 (test lần thứ N-1=2, N=3 giá trị mock — C-NTF-02 Partially Resolved, ngưỡng thật chưa chốt số)`
+  - TC_03.2 — `Technique: BVA-max (test đúng tại ngưỡng N=3 giá trị mock — ...)`
+  - TC_03.3 — `... | Ngưỡng cụ thể (bao nhiêu lần/ngày) vẫn Open (C-NTF-02, Partially Resolved) — cần BA chốt số trước khi coi test data là final`
+- **Sai 3 điểm:** (1) ngưỡng `N=3 mock` ≠ `5` đang dùng thật trong Steps/Expected; (2) trích **sai clarification** — `C-NTF-02` là về *điều kiện khớp tuyến* (độ lệch khung giờ + chu kỳ quét), không phải trần thông báo; (3) sai **trạng thái** — nói "chưa chốt số / vẫn Open" trong khi BA đã chốt, và chính vì đã chốt nên `SC-NTF-006` (trần theo NGÀY) mới bị DEPRECATED.
+- **Hệ quả:** người execute đọc Remark sẽ dựng test data 3 tin thay vì 5, hoặc treo TC chờ BA vô ích.
+- **Suggestion:** viết lại Remark 3 TC → `Technique: BVA-min-1|max|max+1 (trần 5 thông báo/1 tin — OPR-01/REQ-ASN-005, BA xác nhận 2026-07-29; SC-ASN-013)`, bỏ mọi tham chiếu `C-NTF-02` và "chưa chốt số".
 
 ### 🟡 MINOR
 
-**[R3-10] [FIXED] Ngôn ngữ lẫn "Tap" (Anh) với "Bấm" (Việt) trong cùng Steps — 7 TC**
-
-- `TC_01.13, .14, .15, .16, .17` (Hoạt động), `TC_03.19, .21` (Thông báo) — vd `"1. Mở app FoxEco → bấm 'Hoạt động' 2. Tap vào card đơn..."`.
-- Finding lặp lại y hệt report 2026-07-28 (cũng đúng 7 TC, cùng danh sách) — chưa được sửa.
+| # | Check | Sheet / TC | Field | Issue | Suggestion |
+|---|-------|-----------|-------|-------|-----------|
+| m1 | `R2-12` | `Coverage Matrix - Thông báo` row 7 | SC ID | Vẫn có row `SC-NTF-006` **(DEPRECATED 2026-07-29)** và ghi nhận **3 TC** cho nó | Xoá row (hoặc đánh dấu DEPRECATED, 0 TC) trong `fragments/TC-NTF-v1.0.xlsx` |
+| m2 | `R2-13` | Toàn bộ 9 Coverage Matrix | SC ID | **`SC-ASN-013` — chủ sở hữu thật của TC_03.1-3 — không có row ở BẤT KỲ matrix nào.** Cùng gốc với m1/M2: TC đã đổi scenario nhưng matrix chưa theo | Thêm row `SC-ASN-013` (3 TC, B2 BVA ×3) vào matrix Thông báo. Cặp m1+m2 làm `test-report §8` và `health-check C-08/C-09` báo sai coverage cho 2 scenario |
+| m3 | `R2-13` | `Coverage Matrix - Trang chủ` footer | Total TCs | Footer ghi `Total TCs derived: 31` nhưng per-row sum = **32** và sheet TC_05 có **32 TC** thật (stale sau khi thêm 1 TC ngày 2026-07-30) | Sửa footer → 32 |
+| m4 | `R2-13` | `Coverage Matrix` (Hoạt động) | SC ID | Row gộp **`SC-ORD-004/005`** — 2 SC ID trong 1 dòng, phá parse SC↔TC của tool downstream. Hệ quả kèm theo: `SC-ORD-005` ở matrix Đăng tin ghi **0 TC** nhưng note "100% (1/1)" → parser naive kết luận SC-ORD-005 chưa có TC | Tách thành 2 row `SC-ORD-004` / `SC-ORD-005` với số TC đúng; sửa note của `SC-ORD-005` ở matrix Đăng tin thành dạng "cover tại TC_01 (Hoạt động)" |
+| m5 | `R1-17` | `Test Case 4` — TC_04.81, TC_04.82 | AP | Gắn `Technique: VAL-02-inline-blur` / `VAL-02-scroll-to-first-error` — **`VAL-02` là rule ID của BRD v3.2 §D8.3**, không thuộc bộ technique `B1..B8` mà R1-17 yêu cầu | Đổi sang technique thật (2 TC này là EP/EG của cơ chế báo lỗi), đẩy `VAL-02` sang phần nguồn: `Technique: EG-error-display | Rule: VAL-02 (BRD v3.2 §D8.3)` |
+| m6 | `R3-12` | `Test Case 4` — TC_04.93 | I | Expected bước **1 và 3** = "Field hiển thị đúng giá trị mặc định" — không nêu giá trị nên tự nó không verify được. Steps thì có (`'Tòa nhà Lô B3, KCX Tân Thuận, Q.7'`, `17:30–18:30`). TC_04.63 cùng chủ đề lại ghi rõ giá trị → **không nhất quán trong cùng sheet** | Nêu thẳng giá trị vào Expected (đã verify khớp `BRD v3.2 §D8.2` + `test_data_catalog.md` dòng "Thời gian di chuyển (OFFER, D8.2)") |
+| m7 | `R3-12` | `Test Case 4` — TC_04.106 | I | Expected bước 1 "Màn hiển thị đúng thông tin tin" mơ hồ (assert thật nằm ở bước 2: không còn nút 'Chỉnh sửa') | Bỏ bước 1 hoặc nêu cụ thể trường cần thấy |
+| m8 | `R4-08` | `Test Case 3` — TC_03.8, TC_03.10 | D/F/H/I | 2 TC nằm trong sheet **Thông báo** nhưng assertion chính là **state-transition guard của màn Theo dõi đơn** (chặn MATCHED→DELIVERED bỏ bước; Receiver không chốt được khi chưa DELIVERED); phần thông báo chỉ là mệnh đề phụ. Trùng lõi với `TC_07.16` (`ST-invalid-matched-delivered`) và `TC_07.8/9/10` (Receiver confirm bị chặn ở 3 trạng thái). **Đúng loại đã bị xoá có chủ đích** ở `TC_03.12` ngày 2026-07-28 với cùng lý do | Hoặc viết lại 2 TC chỉ assert phần thông báo ("KHÔNG phát sinh thông báo X khi transition bị chặn"), hoặc xoá và để `TC_07` giữ. Nếu giữ thì ghi Remark dedupe trỏ `TC_07.16` / `TC_07.8-10` |
+| m9 | `R4-10` | Doc ↔ Excel | — | `CLAUDE.md` + `MASTER-MEMORY §8` + `CHANGELOG` ghi *"3 TC dự kiến FAIL có chủ đích: TC_08.7, TC_08.24/25"*. Thực tế trong TC-MASTER là **4 TC: `TC_08.7`, `TC_08.10`, `TC_08.22`, `TC_08.23`** (cả 4 đều đã ghi rõ ⚠ trong Remark — **phía Excel ĐÚNG, phía doc SAI**). `TC_08.24/25` là 2 TC khác hẳn (Carrier huỷ nhận → đơn về "Chờ ghép"). ID lệch vì fragment thêm 2 TC sau khi note được viết | Sửa 3 file doc về đúng 4 ID. Nếu không, người execute mở sai TC và log bug sai |
+| m10 | `R4-07` | 27 TC / 9 sheet | C | DOC Source dùng **5 cách diễn đạt khác nhau cho nguồn phi-tài-liệu**: `Chờ BA bổ sung` ×11, `BA xác nhận qua trao đổi (chat), 2026-07-29` ×7, `UI nền tảng (scroll-load)` ×5, `QA đề xuất hành vi` ×2, `DOC-v1.0-04 / QA đề xuất hành vi` ×2 → không filter được khi rà traceability, và `Chờ BA bổ sung` không cho biết đang chờ clarification nào | Chuẩn hoá 1 vocabulary kèm ID clarification, vd `QA đề xuất — C-ORD-06 (Resolved)` / `Chờ BA — C-NTF-01 (Open)` |
 
 ### 🔵 INFO
 
-- Không tìm thấy hedge-text placeholder kiểu "⚠ QA đề xuất, chưa BA confirm chính thức" còn sót (đã patch sạch ở Update 9). 1 câu có chữ "chưa BA xác nhận" ở `TC_04.85` nhưng đây là ghi chú scoping hợp lệ (giải thích lý do KHÔNG assert dòng "Mã tin" do `C-ORD-05` chưa resolve) — không phải lỗi.
-- Modules ASN/DLV/TS và phần lớn CNL/GIFT chưa có sheet TC riêng — đây là tình trạng ĐÃ BIẾT/có chủ đích theo `MASTER-MEMORY.md` (generate-tc mới cover 4/8 module), không tính là finding của review-tc, ngoại trừ CNL đã bị flag Critical ở trên vì RTM đang báo sai là "có 1 TC" trong khi TC đó không test đúng scope.
+| # | Check | Nội dung |
+|---|-------|----------|
+| i1 | `R2-07` | **Coverage 85/92 scenario (92.4%)**. 7 scenario chưa có TC, tất cả đều có lý do đã ghi trong MEMORY: `SC-TS-001/002/003` (Admin/Trust&Safety — `C-TS-01` Resolved/Deferred, out of scope v1.0) · `SC-ASN-006/009` (engine tự quét khớp tuyến — Phase 1 Scope, **chờ PM chốt**) · `SC-USR-001` (đăng nhập SSO — thuộc host app FoxPro) · `SC-NTF-006` (DEPRECATED). **Không phát sinh R2-01/R2-02** — không NEW/MODIFIED scenario nào bị bỏ sót ngoài danh sách trên. |
+| i2 | `R2-09` `R2-10` | RTM `% phủ` = **0% cho cả 41 Req** — đúng trạng thái pipeline (chưa chạy round execution nào). RTM tổng "Số TC" = 355 > 321 là ĐÚNG: 1 TC gắn nhiều Req được đếm cho từng Req (đã ghi rõ ở dòng ghi chú RTM). |
+| i3 | `R1-17` (format) | **213/213 technique tag** dùng dạng `EP-…`/`BVA-…`/`ST-…`/`EG-…`/`DT-…` thay vì `B1-EP-…` như `generate.md` quy định. Nhất quán 100% toàn project (không phải lỗi ngẫu nhiên) → nên chốt lại convention ở skill hoặc chuẩn hoá 1 lượt, không tính lỗi từng TC. |
+| i4 | `R2-14` | Phân bố technique: **EP 106 (50%)** · BVA 48 · ST 30 · EG 19 · DT 8. Không technique nào >70% → rubric KHÔNG bị over-apply. PW/CRUD/CEG = 0, đều đã log `N/A` kèm lý do per-cột trong Coverage Matrix. |
+| i5 | `R2-15` | TC_06.1 (completeness card Bảng tin) liệt kê 5 trường, **không gồm badge "Tin của bạn"** dù Block Definition có. Không mất coverage — badge có 2 TC riêng `TC_06.2`/`TC_06.3` (có/không) — chỉ là enumeration chưa trọn. |
+| i6 | `R1-17` | **55 TC có Remark trống** = baseline TC (không phải derived) → hợp lệ với comprehensive mode; footer matrix Hoạt động/Cá nhân ("baseline 13 + derived 7", "baseline 10 + derived 5") xác nhận quy ước Total = baseline + derived. |
 
 ## Version-Specific Checks
 
 | Check | Result |
 |-------|--------|
-| CARRIED TCs included (Remark tag) | N/A (v1.0 chưa có version cha) |
-| DEPRECATED TCs removed | ✅ — `SC-NTF-006` (DEPRECATED) không còn TC nào gắn `REQ-NTF-002`/scenario này; 3 TC liên quan đã reassign đúng sang `REQ-ASN-005` |
-| RTM: mọi Req ID có row + đủ term COUNTIF | ✅ [FIXED] — đã thêm 2 row (`REQ-ASN-005` Số TC=3, `REQ-ORD-014` Số TC=6), nay 23/23 Req ID có row, đủ term |
-| RTM: row "Tổng" range SUM bao hết Req ID | ✅ [FIXED] — SUM(E6:E28) đã cập nhật bao đủ 23 row, Tổng Số TC 192→201 |
-| Dashboard: mọi sheet TC có row tương ứng | ✅ — 4/4 sheet, tên tab khớp 100% |
-| Cột A/AM/AN/AO vẫn là formula (không bị gõ đè) | ✅ — 175/175 TC đều dùng formula copy-down, không phát hiện giá trị tĩnh nào |
-| DOC Source (C) — hết nhãn "Quan sát thực tế app" mơ hồ | ✅ — 0/175 còn nhãn cũ, đã thay đủ 3 nhãn cụ thể (xem mục Context) |
-| Duplicate Testcase ID | ✅ — 0 trùng lặp trong 175 TC |
-| Required fields (Req ID/DOC Source/Title/Precondition/Steps/Expected/Priority/Origin/Review) trống | ✅ — 0 trống (trừ Group ở 5 TC dùng sai giá trị, xem Major) |
+| CARRIED TCs included (Remark tag) | **N/A** — v1.0 là version đầu, MASTER-MEMORY §4 regression scope rỗng (0/0). R2-11 / R4-09 / R4-10-carried không áp dụng |
+| DEPRECATED TCs removed | **Y ở sheet TC** (0/321 TC gắn `SC-NTF-006`) · **N ở Coverage Matrix** → xem m1 |
+| RTM: mọi Req ID có row + đủ term COUNTIF | **Y** — 40/40 Req ID xuất hiện trong sheet TC đều có row; 41 row × 4 công thức (E/F/G/H) đều nối đủ **9 term** cho 9 sheet; 0 orphan |
+| RTM: row "Tổng" range SUM bao hết Req ID | **Y** — `SUM(E6:E46)` phủ đúng data row 6→46, không sót 18 Req ID mới thêm |
+| Dashboard: mọi sheet TC có row tương ứng | **Y** — 9/9, cột D khớp **100%** tên tab thật; TOTAL recalc = 321 |
+| Cột A / AM / AN / AO vẫn là formula | **Y** — 321/321 row, 0 ô bị gõ giá trị tĩnh (R1-01 & R4-11 sạch) |
+| Round data N–AL trống | **Y** — 321 row × 25 cột, 0 ô có dữ liệu (R1-15 sạch) |
+| Enum Group / Priority / Origin / Review | **Y** — 100% hợp lệ. Group: Functional 208 · UI 112 · Integration 1. Priority: High 45 · Medium 185 · Low 91 (=321, khớp Summary C19/20/21) |
+| Testcase ID liên tục, không trùng | **Y** — `TC_01.1`→`TC_01.20`, `TC_02.1`→`TC_02.15`, … `TC_09.1`→`TC_09.16`; 0 duplicate, 0 nhảy số, 0 phantom row |
+| Steps ↔ Expected numbering | **Y** — 321/321 hợp lệ theo convention project (Expected đánh số theo *step có kết quả cần assert*, là subset của step numbers): 0 TC tham chiếu step không tồn tại, 0 TC thiếu Expected cho step cuối |
+| Title bắt đầu bằng "Check" (Guideline mục 3) | **Y** — 321/321 |
+| Pre-condition / Steps / Expected trống | **0** (R1-07 / R1-08 / R1-09 sạch) |
+| Automated / Script consistency | **Y** — 321 TC đều `Automated=No`, Script trống |
+| R3-13 verbatim drift vs Source Quote | **Sạch trên mẫu kiểm** (TC_08.1 popup Huỷ nhận đơn · TC_06.1 card Bảng tin · TC_09.3/9.4 màn + chip Tặng quà · TC_04.63 default Thời gian · TC_01.9 dòng lý do Hết hạn) — Expected trích đúng verbatim từ Source Quote / ảnh Figma; default `17:00–18:30` (NEED §D8.1) vs `17:30–18:30` (OFFER §D8.2) dùng đúng cho từng form |
+| R3-03 test data inline trong Steps | **Y** — 0/321 TC có bước "nhập/điền" mà thiếu giá trị cụ thể inline |
+| R3-08 Pre-condition trùng Steps | **0** — pattern "Pre = trạng thái đã đăng nhập / Steps = điều hướng" dùng nhất quán, không phải duplication |
+| R3-11 Step > 200 ký tự | **0** |
+| R4-06 Duplicate TC (trùng Title) | **0** trùng tuyệt đối; 1 cặp trùng *lõi assertion* → xem m8 |
+| R2-03 / R2-08 negative + happy path per module | **Y** — 9/9 module đều có cả TC positive và negative |
+| R2-05 UI TC per module | **Y** — 9/9 module đều có ≥2 TC Group=UI |
+| R2-15 Field/Column completeness | **42 TC completeness** phủ **32/33 block có ≥2 field** → 1 gap = M1. Block `DLV / Xác nhận đã nhận hàng (đầy đủ)` cố ý 0 TC (`C-DLV-03` Resolved — out of scope v1.0); block `USR / Kênh liên hệ` cố ý 0 TC hành vi (`C-USR-02` Resolved — phase sau, chỉ có TC_02.10 xác nhận GAP) |
 
 ## Score Breakdown
 
 ```
 Score = 100 - (CRITICAL×5 + MAJOR×3 + MINOR×1)
-      = 100 - (4×5 + 3×3 + 1×1)
-      = 100 - (20 + 9 + 1)
-      = 70
-Quality Gate G1 (≥70): PASS (biên giới — khuyến nghị fix ít nhất 2/4 Critical trước khi vibe-test)
+      = 100 - (0×5 + 2×3 + 10×1)
+      = 100 - 16
+      = 84
 ```
 
-## Khuyến nghị ưu tiên (trước khi chạy `/vibe-test`)
+| | |
+|---|---|
+| **Verdict** | **CONDITIONAL** (70–89 — fix recommended) |
+| **Quality Gate G1** | **PASS** (≥70) → downstream KHÔNG bị block |
+| Direct-mode cap | 85 (score 84 dưới cap → không bị điều chỉnh) |
 
-1. **Bắt buộc trước khi chạy bất kỳ round test nào:** xoá round data N:AL ở 17 dòng contaminated trong `Test Case 3` (14 TC + 3 block-label) — nếu không Dashboard/RTM sẽ báo sai kết quả pass/fail ngay từ round đầu tiên.
-2. **Bắt buộc fix formula RTM cột F (Đã chạy):** đổi `COUNTIFS(...,"<>")` → `COUNTIFS(...,"Pass")+COUNTIFS(...,"Fail")` — nếu không, metric "% phủ chạy" vô dụng cho toàn bộ vòng đời project.
-3. **Cần quyết định:** bổ sung TC cho `REQ-CNL-001` (3 scenario P1/P2 huỷ đơn) — đây là gap lớn nhất về coverage thực chất, không phải lỗi hình thức.
-4. `/generate-tc --consolidate` lại để thêm 2 row RTM còn thiếu (`REQ-ASN-005`, `REQ-ORD-014`).
-5. Có thể gộp cùng 1 lần sửa: Group `"Business Rule"` → `"Functional"` (5 TC) + Tap→Bấm (7 TC) + R1-04 numbering (57 TC, lower priority vì không gây mơ hồ thật).
+So với bản review trước (2026-07-29): scope tăng 175 → **321 TC**, sheet 4 → **9**, Critical **4 → 0**, Major **3 → 2**, score **70 → 84**. Toàn bộ finding cấu trúc/RTM/Dashboard của lần trước đã đóng; 2 Major còn lại là **gap coverage mới phát hiện** (M1) và **metadata drift** (M2), không phải finding cũ tái diễn.
 
-## Checklist
+## Recommendations — thứ tự nên làm
 
-- [x] TC-MASTER parsed (openpyxl + LibreOffice headless recalc) — cả 4 sheet TC đã duyệt
-- [x] Row label Screen/Block (cột A rỗng theo pattern `TC_0N.M`) đã loại khỏi tập TC trước khi đếm — phát hiện thêm: 3 row Block-label bị lẫn round data (xem Critical #1)
-- [x] Formula cột A/AM/AN/AO đối chiếu (data_only=False) — không bị gõ đè
-- [x] Agent gọi (không tồn tại → fallback Direct + disclaimer, theo đúng lần trước)
-- [x] R1-R4 checks run (60 checks, không giới hạn ở checklist cũ)
-- [x] Findings classified by severity
-- [x] Score calculated: 70/100
-- [x] Report file tạo/cập nhật
-- [x] §8 = COMPLETED
+1. **Fix M2 + m1 + m2 cùng lúc** (1 gốc: TC_03.1-3 đã đổi scenario `SC-NTF-006` → `SC-ASN-013` ngày 2026-07-29 nhưng Remark + Coverage Matrix chưa theo). Sửa ở `fragments/TC-NTF-v1.0.xlsx` rồi `/generate-tc --sync`.
+2. **Fix M1** — bổ sung 2 TC màn "Quà đã nhận" (completeness 4 thành phần + danh sách lịch sử) vào `fragments/TC-CANHAN-v1.0.xlsx`. Đây là **gap coverage thật duy nhất** tìm được trong 321 TC.
+3. **Fix m9 ngay** (rẻ nhất, rủi ro cao nhất khi execute): sửa 4 ID TC dự kiến FAIL trong `CLAUDE.md` / `MASTER-MEMORY §8` / `CHANGELOG`.
+4. Nhóm matrix/metadata: m3, m4, m5, m10.
+5. Nhóm nội dung: m6, m7, m8.
+6. **Trước khi execute:** chốt với PM 2 scenario `SC-ASN-006/009` (auto-match) và 5 nhánh phụ DLV (`SC-DLV-001/002/003/004/008`) — TC đã viết sẵn nhưng scope chưa chốt; xác nhận với Dev/DevOps khả năng **mock thời gian** trên STG cho `TC_07.35/36/37` (BVA ngưỡng 2h/4h), nếu không mock được thì 3 TC này phải chuyển sang kiểm thử tầng backend/log.
+7. Chạy `/review-tc --recheck` sau khi fix — muốn score độc lập thật thì bổ sung `review-agent/AGENT.md` vào skill trước.

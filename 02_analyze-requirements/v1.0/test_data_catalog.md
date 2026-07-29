@@ -59,7 +59,55 @@
 |-------|-------|---------|----------|-------|
 | Lý do huỷ | text bất kỳ không rỗng, ≥5 ký tự | rỗng, 1-4 ký tự (→ nút Xác nhận huỷ bị khoá/disable — VAL-04) | **5 ký tự (hợp lệ, bật nút), 4 ký tự (chặn, disable)** (BRD v3.2 §D8.3) | US-D16, BR-CNL-01, BRD v3.2 §D8.3 |
 
+## Fixture — Tài khoản & Đơn hàng mẫu (cross-module, ⚠ NEW 2026-07-29)
+
+> **Vì sao có mục này:** review pre-consolidate 2026-07-29 phát hiện **44 TC** (8 TC ở 4 fragment cũ + 36 TC ở 5 fragment mới) có Pre-condition dạng *"đơn đang ở trạng thái X"* / *"tài khoản là Carrier của đơn"* nhưng catalog chỉ có giá trị **field-level** (nội dung ô nhập), KHÔNG có bộ **tài khoản/đơn hàng mẫu**. Tester/automation không biết dùng account nào, đơn nào để chạy. Mục này liệt kê đúng những fixture các TC hiện tại đang cần.
+>
+> **Lưu ý cấu trúc:** 3 bảng dưới đây (F1/F2/F3) KHÔNG áp structure-lock 5 cột `| Field | Valid | Invalid | Boundary | Nguồn |` của các bảng per-module ở trên — đây là bảng fixture (dữ liệu môi trường), không phải bảng giá trị field.
+>
+> Mọi giá trị cụ thể để `[TBD]` — **phải điền khi setup môi trường STG** (`07_environments/environments.md`), KHÔNG bịa giá trị trong tài liệu phân tích.
+
+### F1. Tài khoản theo vai trò
+
+| ID fixture | Vai trò | Dùng cho | Giá trị |
+|---|---|---|---|
+| `ACC-SENDER` | Người gửi (Sender) | 59 TC | `[TBD: MNV/email SSO]` |
+| `ACC-CARRIER` | Người vận chuyển (Carrier) | 82 TC | `[TBD: MNV/email SSO]` |
+| `ACC-RECEIVER` | Người nhận (Receiver) | 37 TC | `[TBD: MNV/email SSO]` |
+| `ACC-CARRIER-2` | Carrier thứ hai | Chống double-accept (`TC_06.31`), tin ẩn sau ghép (`TC_06.6`), khớp lại sau huỷ (`TC_06.9`) | `[TBD]` |
+| `ACC-NEW` | Tài khoản mới, 0 đơn đã giúp / 0 quà | `TC_05.9` (BVA-min card Đóng góp), `TC_05.9` (card Đóng góp = 0) | `[TBD]` |
+| `ACC-HEAVY` | Tài khoản ≥100 đơn đã giúp | `TC_05.11` (BVA-large, không tràn layout) | `[TBD]` |
+
+> 3 tài khoản đầu phải thuộc **cùng 1 đơn** để chạy được các TC đồng bộ realtime 3 bên (`TC_06.30`, `TC_07.21`, `TC_08.20`, `TC_08.23`) — khuyến nghị dùng `/vibe-multi` (đa-device).
+
+### F2. Đơn hàng theo trạng thái
+
+| ID fixture | Trạng thái | Số TC cần | Ghi chú dựng dữ liệu |
+|---|---|---|---|
+| `ORD-POSTED` | Chờ ghép (POSTED) | 32 | Chưa ai nhận; cần cho cả nhánh Bảng tin lẫn huỷ trước ghép |
+| `ORD-MATCHED` | Đã ghép (MATCHED, stepper hiện "Lấy hàng") | 40 | Carrier CHƯA bấm "Tôi đã lấy hàng" |
+| `ORD-IN-TRANSIT` | Đang giao (IN_TRANSIT) | 15 | Dùng cho nhóm TC chặn huỷ sau khi lấy hàng |
+| `ORD-DELIVERED` | Đã giao (DELIVERED) | 15 | Dùng cho ma trận nhãn nút + escalate quá hạn |
+| `ORD-COMPLETED` | Hoàn thành (COMPLETED) | 22 | Chưa tặng quà — cần cho `TC_09.1` (nút "Cảm ơn người vận chuyển" còn enable) |
+| `ORD-COMPLETED-GIFTED` | Hoàn thành + đã tặng quà | 2 | `TC_09.15/16` (nhãn "Bạn đã đánh giá", không gửi lại được) |
+| `ORD-CANCELLED` | Đã huỷ | — | Sinh ra trong lúc chạy TC huỷ, không cần dựng sẵn |
+| `ORD-EXPIRED` | Hết hạn | 1 | `TC_01.17` (card "Hết hạn" không cho thao tác) |
+| `ORD-WITH-PHOTO` | Bất kỳ, có kèm 1 ảnh hàng | 2 | `TC_06.13` — cần **file ảnh gốc** để đối chiếu trực quan: `[TBD: tên file, định dạng, dung lượng]` |
+| `ORD-NO-PHOTO` | Bất kỳ, KHÔNG kèm ảnh | 1 | `TC_06.14` (hiển thị ảnh mặc định) |
+
+### F3. Bộ dữ liệu danh sách (cho BVA/DT sắp xếp & trần hiển thị)
+
+| ID fixture | Nội dung | Dùng cho |
+|---|---|---|
+| `FEED-4` / `FEED-5` / `FEED-6` | 4 / 5 / 6 tin NEED phù hợp tuyến của `ACC-CARRIER` | `TC_05.27/28/29` (BVA trần 5 tin section "Tin mới") |
+| `FEED-DIST` | 3 tin khác độ gần tuyến, **cùng** thời điểm đăng | `TC_05.30`, `TC_06.10` (DT-rule1 sắp theo độ gần) |
+| `FEED-TIME` | 2 tin **cùng** độ gần tuyến, khác thời điểm đăng | `TC_05.31`, `TC_06.11` (DT-rule2 sắp theo thời gian) |
+| `TIME-ESCALATE` | Đơn ở "Đã giao" mock được mốc 1h55' / >2h / >4h | `TC_07.35/36/37` (BVA ngưỡng escalate) — cần cơ chế mock thời gian hệ thống, `[TBD: cách mock trên STG]` |
+
+**Chưa giải quyết được ở tầng tài liệu:** `TIME-ESCALATE` phụ thuộc khả năng mock thời gian của môi trường STG — nếu STG không mock được, 3 TC này phải chuyển sang kiểm thử ở tầng backend/log thay vì UI. Cần xác nhận với Dev/DevOps.
+
 ## Ghi chú chung
+- **Cập nhật 2026-07-29 (review pre-consolidate):** bổ sung mục **Fixture** ở trên (F1 tài khoản · F2 đơn theo trạng thái · F3 bộ dữ liệu danh sách) — đóng finding INFO "catalog thiếu fixture đơn hàng/tài khoản" ảnh hưởng 44 TC. Giá trị cụ thể để `[TBD]`, phải điền khi setup môi trường STG.
 - Giá trị "master data" (6 văn phòng preset FPT — LOC-03; danh mục Loại hàng 8 chip; danh sách tỉnh/thành ghép địa lý) phụ thuộc environment thật — xác nhận giá trị thực khi vibe-test/automation.
 - Boundary values (in **đậm**) là ứng viên chính cho BVA ở generate-tc. **Cập nhật 2026-07-27:** ngưỡng giá trị hàng BR-ORD-03 xác nhận **Out of scope v1.0** (C-ORD-02, Resolved — Deferred) — KHÔNG viết BVA cho ngưỡng này ở v1.0. Hạn tin (ORD-06) KHÔNG còn là boundary thiếu số — BA/PO xác nhận hạn tin = giá trị "Đến ngày" mà user tự chọn lúc đăng tin (C-ORD-03, Resolved); BVA cho hạn tin nên test theo giá trị ngày user nhập (vd ngày gần nhất/xa nhất hệ thống cho phép chọn), không phải theo 1 hằng số hệ thống. Chi tiết xem `MEMORY.md §6`.
 - **Cập nhật 2026-07-28 (BRD v3.2 §D8):** bổ sung toàn bộ maxlength/min-length/BVA còn thiếu cho module ORD (Ghi chú, Địa chỉ, Tên người nhận, khung giờ NEED+OFFER, ảnh sản phẩm) và CNL (lý do huỷ) — trước đây các field này ghi "chưa có số cụ thể"/TBD, nay đã có giá trị chính thức từ BA. Xem `MEMORY.md §6.1 C-ORD-01` (đầy đủ) và `C-ORD-02` (phân biệt cảnh báo categorical "Giá trị hàng = Cao" — đang có ở v1.0 — với ngưỡng số tiền BR-ORD-03 — vẫn deferred).
