@@ -33,6 +33,8 @@
 | REQ-ORD-011 | Quan sát thực tế app (không có ID doc gốc) | — | SC-ORD-015..026 | — |
 | REQ-ORD-012 | D8.1/D8.2 (không có ID row riêng — BRD v3.2 mới) | §D8.1, §D8.2 | SC-ORD-013, SC-ORD-027, SC-ORD-028 | C-ORD-01 (Resolved đầy đủ, 2026-07-28) |
 | REQ-ORD-013 | VAL-01..05 | §D8.3 | SC-ORD-029, SC-ORD-030 | — |
+| REQ-ORD-014 | Quan sát thực tế app (không có ID doc gốc) | — | SC-ORD-031, SC-ORD-032 | — |
+| REQ-ORD-015 | Không có ID doc gốc (bảng "Thành phần chung", không đánh số) | §2, §3.1 | SC-ORD-033 | — |
 
 ### Module ASN — DOC-v1.0-01
 | REQ ID | Maps (Ref DOC) | DOC §section | Scenarios | Clarification |
@@ -41,11 +43,12 @@
 | REQ-ASN-002 | ASN-02, BR-CON-01, BR-CON-02 | §D3, §A5 | SC-ASN-002, SC-ASN-003 | C-ASN-01 (Resolved, 2026-07-27) |
 | REQ-ASN-003 | ASN-03, OPR-03 | §D3, §D7 | SC-ASN-004, SC-ASN-005 | — |
 | REQ-ASN-004 | MTCH-01, BR-MTCH-01 | §D3, §D4 | SC-ASN-006, SC-ASN-007 | — |
-| REQ-ASN-005 | OPR-01 | §D7 | SC-ASN-008 | — |
+| REQ-ASN-005 | OPR-01 | §D7 | SC-ASN-008, SC-ASN-013 | — |
 | REQ-ASN-006 | OPR-02 | §D7 | SC-ASN-009 | C-NTF-02 (Partially Resolved, 2026-07-27) |
 | REQ-ASN-007 | OPR-04 | §D7 | SC-ASN-010 | — |
 | REQ-ASN-008 | OPR-05 | §D7 | SC-ASN-011 | C-ASN-02 (Resolved, 2026-07-27) |
 | REQ-ASN-009 | OPR-08 | §D7 | SC-ASN-005, SC-ASN-012 | — |
+| REQ-ASN-010 | Không có ID doc gốc (không đánh số) | §3.3 | SC-ASN-014 | — |
 
 ### Module DLV — DOC-v1.0-01
 | REQ ID | Maps (Ref DOC) | DOC §section | Scenarios | Clarification |
@@ -75,7 +78,7 @@
 | REQ ID | Maps (Ref DOC) | DOC §section | Scenarios | Clarification |
 |--------|----------------|--------------|-----------|---------------|
 | REQ-NTF-001 | NTF-01..09 | §D6 + DOC-v1.0-04 | SC-NTF-001, SC-NTF-002, SC-NTF-003, SC-NTF-004, SC-NTF-005, SC-NTF-007, SC-NTF-008, SC-NTF-009 | C-NTF-01 (Open — bảng unified 3 nguồn bổ sung 2026-07-27, chờ BA chọn); C-ORD-06 (Resolved — QA xác nhận empty state text đúng UI thật, mở rộng sang NTF, 2026-07-28); C-NTF-03 (Resolved — QA xác nhận cơ chế đánh dấu đã đọc + phân trang đúng UI thật, 2026-07-28) |
-| REQ-NTF-002 | OPR-06, OPR-07 | §D7 | SC-NTF-006 | C-NTF-02 (Partially Resolved, 2026-07-27) |
+| REQ-NTF-002 | OPR-06, OPR-07 | §D7 | SC-NTF-006 (DEPRECATED 2026-07-29 — không có ngưỡng ngày) | C-NTF-02 (Partially Resolved, 2026-07-27) |
 
 ### Module TS — DOC-v1.0-01
 | REQ ID | Maps (Ref DOC) | DOC §section | Scenarios | Clarification |
@@ -84,8 +87,8 @@
 | REQ-TS-002 | TS-03 | §A8 | SC-TS-003 | C-TS-01 (Resolved — Deferred, 2026-07-27) |
 
 ## 2. Coverage Summary
-- **Scenario có REQ + DOC source:** 87/87 (100%).
-- **REQ có ≥1 scenario:** 42/43 (~98%) — mọi REQ core functional/business-rule đều có ≥1 scenario.
+- **Scenario có REQ + DOC source:** 92/92 (100%).
+- **REQ có ≥1 scenario:** 45/46 (~98%) — mọi REQ core functional/business-rule đều có ≥1 scenario.
 - **REQ chưa có scenario (gap có chủ đích):** `REQ-GIFT-002` (RAT-01/02) — **Deferred (Resolved 2026-07-27)**: BA/PO xác nhận rating 1-5 sao là phase sau, out of scope v1.0 — không derive scenario cho tới khi tính năng vào scope ở version sau.
 - **REQ đánh dấu Deferred/Out-of-scope v1.0 (BA/PO xác nhận 2026-07-27, vẫn giữ scenario hiện có làm tham khảo, KHÔNG mở rộng TC cho phần deferred):** `REQ-USR-004` (tier/hạng), `REQ-USR-005` (cấu hình kênh liên hệ), `REQ-ORD-009` (ngưỡng giá trị hàng/BVA), `REQ-GIFT-002` (rating sao), `REQ-TS-002` (Admin Portal — chỉ test hệ quả end-user), `REQ-DLV-005` phần "Báo sự cố" (chỉ test lối thoát tồn tại, không test field chi tiết).
 - **(Mốc cập nhật):** 2026-07-24 — INIT v1.0, phân tích lần đầu từ DOC-v1.0-01/02/03.
@@ -96,6 +99,10 @@
 - **(Mốc cập nhật #6):** 2026-07-27 — UPDATE, gap phát hiện khi review TC-NTF — +2 scenario `SC-NTF-008` (đánh dấu đã đọc), `SC-NTF-009` (scroll load thêm dữ liệu), +1 clarification mới `C-NTF-03` (Open, cơ chế chưa BA/Dev confirm).
 - **(Mốc cập nhật #7):** 2026-07-27 — UPDATE, fix finding từ health-check — Coverage Summary 65/65 → **82/82** (SC-ORD-015..026 đã có sẵn ở bảng REQ-ORD-011 dòng trên từ trước, chỉ dòng Coverage Summary tổng hợp bị stale, không sync theo). Data-repair, không thêm scenario mới.
 - **(Mốc cập nhật #8):** 2026-07-28 — UPDATE, BRD v3.2 mới (`00_input/v1.0/27072026/FoxEco BRD v3.2.md`) — chỉ thêm `§D8 Validate & Giá trị mặc định (Form Rules)` so với v3.1 (còn lại giữ nguyên). +2 REQ (`REQ-ORD-012`, `REQ-ORD-013`), +4 SC ORD (`SC-ORD-027..030`), +1 SC CNL (`SC-CNL-005`), 1 SC MODIFIED (`SC-ORD-013`, un-deferred). Resolve dứt điểm phần maxlength TBD của `C-ORD-01`. Coverage Summary 82/82 → **87/87**; REQ 41 → **43** (dòng "Tổng" ở `MEMORY.md §3` vốn đã lệch 40 vs tổng thật per-module 41 từ trước, tiện thể data-repair cùng lúc). Chi tiết đầy đủ: `MEMORY.md` header + §6.1 (C-ORD-01, C-ORD-02, C-NTF-02).
+- **(Mốc cập nhật #9):** 2026-07-29 — UPDATE, QA GiangDC2 rà lại TC Đăng tin qua chat — phát hiện Block "Người gửi" (Wizard NEED) chưa test editability (Tên read-only/SĐT+Địa chỉ editable) và chưa có TC cho hành vi autocomplete địa chỉ theo text nhập (case-insensitive, quan sát trực tiếp app STG, không có trong tài liệu). +1 REQ mới (`REQ-ORD-014`), +2 SC ORD (`SC-ORD-031`, `SC-ORD-032`). Coverage Summary 87/87 → **89/89**; REQ 43 → **44**. Chi tiết đầy đủ: `MEMORY.md` header #10 + REQ-ORD-002 addendum + REQ-ORD-014.
+- **(Mốc cập nhật #10):** 2026-07-29 — UPDATE, BA xác nhận rõ cơ chế trần thông báo khớp tin (OPR-01/`REQ-ASN-005`) qua QA GiangDC2 — là notification-firing cap (Carrier chỉ NHẬN tối đa 5 thông báo khớp/lượt quét), tách biệt khỏi UI cap Trang chủ (`SC-ASN-008`, US-D06) đã có sẵn. +1 SC (`SC-ASN-013`). Coverage Summary 89/89 → **90/90**.
+- **(Mốc cập nhật #11):** 2026-07-29 — UPDATE, chuẩn bị merge phần "chi tiết + flow" từ 1 QC khác trong team (project riêng `02_analyze-requirements CA`, đã tự phân tích trên demo HTML) — trước khi generate-tc cho các màn còn thiếu, rà lại thấy 2 màn dùng chung (Trang chủ, Bảng tin) vốn đã có sẵn text mô tả đầy đủ trong `DOC-v1.0-02 §2`/`§3.1`/`§3.3` (đăng ký từ INIT 2026-07-24) nhưng CHƯA từng được capture thành Block Definition/scenario riêng — chỉ có scenario cho 2 block con của Trang chủ ("Đơn của tôi"/"Tin mới", SC-ORD-003/004) và vài scenario business-rule tham chiếu tên màn Bảng tin (SC-ASN-005/010/012), chưa có scenario nào verify cấu trúc khung 2 màn này. Bổ sung: +2 REQ (`REQ-ORD-015` Trang chủ, `REQ-ASN-010` Bảng tin), +2 SC (`SC-ORD-033`, `SC-ASN-014`), +2 Block Definition mới trong `test_scenario_map.md` (Header/Banner&Card/Bottom-nav dưới Screen Trang chủ; Danh sách tin đăng dưới Screen Bảng tin, module ASN). Nguồn tham khảo cấu trúc field bổ sung: TC do QC khác (`03_test-cases/TestCases-CA.xlsx` sheet Trang chủ/Bảng tin) — CHỈ dùng làm checklist field, mọi Source Quote/Location trong 2 REQ/SC mới đều trích trực tiếp từ `DOC-v1.0-02` (đã đăng ký sẵn trong project này), không trích từ TC của CA. **Chưa có cross-check ảnh Figma (DOC-v1.0-04)/app STG riêng cho field Header/Banner/Card** — theo Project_rule.md §10.1, nên vibe-test xác nhận trước khi coi Expected Result final (xem Analyst Note SC-ORD-033 trong `test_scenario_map.md`). Coverage Summary 90/90 → **92/92**; REQ 44 → **46**.
+- **(Mốc cập nhật #11):** 2026-07-29 — UPDATE, BA xác nhận thêm: KHÔNG có ngưỡng thông báo theo NGÀY (OPR-06/`REQ-NTF-002`) — chỉ có trần theo TỪNG TIN (OPR-01/`REQ-ASN-005`), đăng N tin → tối đa 5×N thông báo. `SC-NTF-006` chuyển **DEPRECATED**. Viết lại 3 TC (`TC_03.1-3` trong `TC-NTF-v1.0.xlsx`, đồng bộ TC-MASTER) từ "trần/ngày mock N=3" sang đúng "trần 5/tin", gán cho `SC-ASN-013`.
 
 ## 3. Clarifications — Source Quote (ambiguous text)
 

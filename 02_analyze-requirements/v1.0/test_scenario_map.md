@@ -10,6 +10,9 @@
 - **Cập nhật 2026-07-24 (bổ sung):** +4 scenario (SC-DLV-012/013/014, SC-GIFT-004) từ ma trận nhãn nút quan sát thực tế app STG (QA GiangDC2) — xem block "Theo dõi đơn — Ma trận nhãn nút theo trạng thái" trong mục DLV.
 - **Cập nhật 2026-07-24 (bổ sung #2):** thêm nguồn DOC-v1.0-04 (82 ảnh Figma "Fox Eco Doc") — bổ sung verbatim text/button chính xác cao cho các Screen: Đăng tin thành công (+ phát hiện mâu thuẫn "Mã tin", xem C-ORD-05), Thông báo (+1 block nội dung thực tế), Cá nhân (badge tier), Tặng quà (popup "Đã gửi lời cảm ơn!"), Theo dõi đơn — Ma trận nhãn nút (xác nhận verbatim + popup xác nhận), Huỷ đơn (form lý do + màn "Đơn đã huỷ"). Không phát sinh scenario mới trong đợt này — chỉ tăng độ chính xác text cho scenario đã có.
 - **Cập nhật 2026-07-27 (UPDATE — BA/PO trả lời batch clarifications):** cập nhật nội dung Given/When/Then + Analyst Note cho các scenario bị ảnh hưởng bởi 13/16 clarification vừa Resolved/Deferred (không đổi tổng số 62 scenario). Đáng chú ý: `SC-ORD-013` (ngưỡng giá trị hàng) đánh dấu **DEFERRED — không derive TC ở v1.0**; `SC-USR-004/SC-USR-005` (tier, kênh liên hệ) và `REQ-GIFT-002` (rating) xác nhận Out-of-scope v1.0; `SC-ASN-003/SC-ASN-011` (SĐT lộ sớm, tự khớp chính mình) chuyển từ "gap chờ xác nhận" sang "regression test theo rule đã chốt"; `SC-DLV-011` gộp về 1 TC duy nhất theo modal đơn giản (form đầy đủ out of scope). Chi tiết đầy đủ: `MEMORY.md §6/§6.1`.
+- **Cập nhật 2026-07-29:** QA GiangDC2 rà lại TC Đăng tin — bổ sung `SC-ORD-031`/`SC-ORD-032` (autocomplete địa chỉ văn phòng theo text nhập, không phân biệt hoa/thường, cho cả Địa chỉ lấy hàng lẫn Địa chỉ giao hàng) + cập nhật Block "Người gửi"/"Người nhận" với chi tiết editability (Tên read-only, SĐT editable+validate) và rule SĐT còn thiếu TC dù đã có sẵn trong REQ-ORD-012. Xem `MEMORY.md` header #10, REQ-ORD-014.
+- **Cập nhật 2026-07-29 (bổ sung, BA xác nhận trần thông báo):** BA nhấn mạnh lại rõ OPR-01 (`REQ-ASN-005`) là trần SỐ LƯỢNG thông báo khớp tin bắn cho Carrier (tối đa 5), không chỉ là UI cap ở Trang chủ (`SC-ASN-008`, US-D06) như đã viết trước đây — bổ sung `SC-ASN-013` để test đúng hành vi bắn thông báo. Xem `MEMORY.md` header #11.
+- **Cập nhật 2026-07-29 (bổ sung #2, BA xác nhận KHÔNG có ngưỡng ngày):** BA làm rõ thêm: trần 5 tính RIÊNG theo từng tin OFFER, KHÔNG cộng dồn/giới hạn theo ngày (đăng N tin → tối đa 5×N thông báo). `SC-NTF-006` (OPR-06, trần/ngày) DEPRECATED. Viết lại 3 TC trong `TC-NTF-v1.0.xlsx` (`TC_03.1-3`) từ hướng "trần/ngày mock N=3" sang đúng "trần 5/tin", gán lại cho `SC-ASN-013`. Xem `MEMORY.md` header #12.
 
 ## Block Definitions (Screen → Block → Fields/Rules)
 
@@ -99,6 +102,54 @@
 **Source Location:** `DOC-v1.0-02 §3.1 "Màn hình Trang chủ" · Table 3`
 
 **Scenarios liên quan:** SC-ASN-005 (liên quan)
+
+##### Block: Header (⚠ NEW 2026-07-29)
+
+| # | Field/Cột/Action | Rule ngắn |
+|---|-------------------|------------|
+| 1 | Icon vai trò + "Xin chào, [Tên]" | Chào theo tên user đăng nhập |
+| 2 | Icon chuông thông báo | Chấm đỏ (red-dot) khi có thông báo chưa đọc, ẩn khi hết thông báo chưa đọc |
+| 3 | Bấm icon chuông | Điều hướng sang màn Thông báo |
+
+**Source Quote:**
+> "Header | Icon vai trò + 'Xin chào, [Tên]' + chuông thông báo (chấm đỏ khi có tin chưa đọc)"
+
+**Source Location:** `DOC-v1.0-02 §2 "Kiến trúc điều hướng dùng chung cho cả 3 vai trò" · Table (Thành phần chung)`
+
+**Scenarios liên quan:** SC-ORD-033
+
+##### Block: Banner quảng bá & Card "Đóng góp của bạn" (⚠ NEW 2026-07-29)
+
+| # | Field/Cột/Action | Rule ngắn |
+|---|-------------------|------------|
+| 1 | Banner quảng bá | "Tiện đường — Giúp đồng nghiệp" + logo "FOX ECO" — tĩnh, không chức năng |
+| 2 | Card "Đóng góp của bạn" | Số đơn đã giúp (lớn) + "Cộng đồng FoxEco: [x] đơn · [y] người" — thống kê cá nhân & cộng đồng |
+| 3 | Nút "Xem bảng tin gửi hàng" | Chuyển sang tab Bảng tin |
+
+**Source Quote:**
+> "Banner quảng bá | 'Tiện đường — Giúp đồng nghiệp' + logo 'FOX ECO' — tĩnh, không chức năng" — "Card 'Đóng góp của bạn' | Số đơn đã giúp (lớn) + 'Cộng đồng FoxEco: [x] đơn · [y] người' — thống kê cá nhân & cộng đồng" — "Nút 'Xem bảng tin gửi hàng' | Chuyển sang tab Bảng tin"
+
+**Source Location:** `DOC-v1.0-02 §2 "Kiến trúc điều hướng dùng chung cho cả 3 vai trò" · Table (Thành phần chung)`
+
+**Analyst Note (cross-check với chỉ số đóng góp màn Cá nhân):** Số liệu "đơn đã giúp" ở card này có khả năng CÙNG NGUỒN DỮ LIỆU với "Chỉ số đóng góp" đã có ở màn Cá nhân (SC-USR-004/SC-USR-006, REQ-USR-004) — chỉ khác bề mặt hiển thị (Trang chủ card rút gọn cá nhân+cộng đồng vs Cá nhân header 2 chỉ số đầy đủ). generate-tc nên coi đây là 2 điểm verify riêng (2 màn khác nhau), không giả định tự động khớp nếu không có bằng chứng UI xác nhận cùng field.
+
+**Scenarios liên quan:** SC-ORD-033
+
+##### Block: Bottom nav — 5 tab (⚠ NEW 2026-07-29)
+
+| # | Field/Cột/Action | Rule ngắn |
+|---|-------------------|------------|
+| 1 | 5 tab | Trang chủ / Bảng tin / [+ Đăng tin] / Hoạt động / Cá nhân |
+| 2 | Tab active | Highlight đúng theo màn đang mở |
+
+**Source Quote:**
+> "Mỗi vai trò có cùng một cấu trúc điều hướng gồm 5 tab dưới cùng: Trang chủ / Bảng tin / Đăng tin (nút '+' nổi bật ở giữa) / Hoạt động / Cá nhân."
+
+**Source Location:** `DOC-v1.0-02 §2 "Kiến trúc điều hướng dùng chung cho cả 3 vai trò" · paragraph 1`
+
+**Analyst Note:** SC-ORD-025 đã test bottom nav 5 tab + highlight riêng cho bề mặt màn Hoạt động (`TC-HOATDONG`) theo đúng pattern "mỗi màn hình 1 lần verify nav" của project — SC-ORD-033 chỉ verify riêng bề mặt Trang chủ (tab "Trang chủ" active), không lặp lại toàn bộ ma trận 5 tab × 5 màn.
+
+**Scenarios liên quan:** SC-ORD-033
 
 #### Screen: Chi tiết tin
 
@@ -191,7 +242,9 @@
 
 **Source Location:** `DOC-v1.0-02 §3.5.2 "Bước 2/3: Địa điểm & Thời gian" · Table 7`
 
-**Scenarios liên quan:** SC-ORD-001
+**Update 2026-07-29 (Quan sát thực tế app STG, QA GiangDC2, qua chat):** BRD không nói rõ editability từng field — QA xác nhận trực tiếp: **Tên** = CHỈ ĐỌC (load từ tài khoản, không cho sửa); **SĐT** = CHO PHÉP sửa, bắt buộc, validate theo rule chuẩn VN (10 số, đầu 0 — dùng chung rule đã có ở REQ-ORD-012 cho SĐT Người nhận); **Địa chỉ lấy hàng** = CHO PHÉP sửa, bắt buộc, mặc định load "nơi làm việc" của tài khoản đăng nhập. Đồng thời phát hiện field Địa chỉ lấy hàng có cơ chế **type-ahead**: gõ text → hệ thống hiện danh sách văn phòng phù hợp từ DB (không phân biệt hoa/thường), **nhưng phải CHỌN 1 item trong danh sách — không được lưu thẳng text tự do đã gõ** (QA nhấn mạnh lại 2026-07-29: "nhập hiển thị gợi ý CHỌN chứ không cho nhập bất kỳ") — xem **REQ-ORD-014** (rule giống hệt cho Địa chỉ giao hàng ở Block Người nhận bên dưới).
+
+**Scenarios liên quan:** SC-ORD-001, SC-ORD-031
 
 ##### Block: Người nhận
 
@@ -207,7 +260,9 @@
 
 **Update 2026-07-28 (BRD v3.2 §D8.1):** Maxlength/validate cụ thể — Tên người nhận **2–60 ký tự**; SĐT chuẩn VN (10 số, đầu 0); Địa chỉ giao hàng **≤200 ký tự**, không để trống, **phải KHÁC Địa chỉ lấy hàng** (rule so sánh field mới); Địa chỉ lấy hàng (Người gửi) cũng ≤200 ký tự.
 
-**Scenarios liên quan:** SC-ORD-007, SC-ORD-011, SC-ORD-012, SC-ORD-027
+**Update 2026-07-29 (rà soát TC, phát hiện gap):** Rule SĐT (10 số, đầu 0) đã có sẵn từ D8.1 nhưng CHƯA từng được viết TC required/format riêng cho field "Số điện thoại" — đã bổ sung TC. Đồng thời field Địa chỉ giao hàng cũng có cơ chế **type-ahead** giống hệt Địa chỉ lấy hàng (gõ text → gợi ý văn phòng từ DB, không phân biệt hoa/thường, **bắt buộc CHỌN từ danh sách — không lưu thẳng text tự do**) — xem **REQ-ORD-014**.
+
+**Scenarios liên quan:** SC-ORD-007, SC-ORD-011, SC-ORD-012, SC-ORD-027, SC-ORD-032
 
 ##### Block: Thời gian
 
@@ -317,6 +372,33 @@
 **Scenarios liên quan:** SC-ORD-015..026 (xem Source Detail per Scenario), SC-ORD-005 (card "Hết hạn", dùng lại)
 
 ### ASN — Ghép nối
+
+#### Screen: Bảng tin (⚠ NEW 2026-07-29)
+
+##### Block: Danh sách tin đăng
+
+| # | Field/Cột/Action | Rule ngắn |
+|---|-------------------|------------|
+| 1 | Icon/ảnh hàng | Ảnh minh hoạ hoặc icon mặc định |
+| 2 | Loại hàng \| giá trị | Tóm tắt trên card |
+| 3 | Badge "Tin của bạn" | Chỉ hiện nếu tin do chính user xem đăng |
+| 4 | Thời gian đăng | Rút gọn |
+| 5 | "Nhận:"/"Giao:" rút gọn + khung giờ | Tóm tắt lộ trình |
+| 6 | Bấm vào 1 tin | Mở màn Chi tiết tin |
+
+**Source Quote:**
+> "Bảng tin — danh sách tin đăng của cộng đồng" — "Mỗi card: icon/ảnh hàng, loại hàng \| giá trị, badge 'Tin của bạn' nếu là tin tự đăng, thời gian đăng, 'Nhận:'/'Giao:' rút gọn, khung giờ." — "Bấm vào 1 tin → mở Chi tiết tin."
+
+**Source Location:** `DOC-v1.0-02 §3.3 "Màn hình Bảng tin"`
+
+**Update — lưu ý gốc từ tài liệu (⚠ cross-check với C-ASN-02, đã Resolved):**
+> "Tin của chính Người gửi vẫn hiển thị trong Bảng tin và khi mở Chi tiết tin vẫn thấy nút 'Tôi mang giúp được' (hành động dành cho vai trò vận chuyển) — cần rà soát logic ẩn nút khi người xem chính là chủ tin."
+
+**Source Location:** `DOC-v1.0-02 §3.3 "Màn hình Bảng tin" · Lưu ý (⚠)`
+
+**Analyst Note:** Ghi chú gốc trong tài liệu (viết tại thời điểm demo chưa fix) chính là bằng chứng bổ sung cho **SC-ASN-011** (không tự khớp với chính mình, C-ASN-02 Resolved 2026-07-27) — tin của chủ vẫn hiển thị bình thường trong danh sách Bảng tin (không bị ẩn khỏi feed), CHỈ nút "Tôi mang giúp được" ở Chi tiết tin mới cần ẩn/disable cho chính chủ tin. Không tạo thêm scenario mới cho hành vi này — đã cover bởi SC-ASN-011.
+
+**Scenarios liên quan:** SC-ASN-014 (mới), SC-ASN-005, SC-ASN-010, SC-ASN-012 (liên quan — business rule ẩn/hiện tin theo trạng thái/độ ưu tiên)
 
 #### Screen: Chi tiết tin (nút hành động vận chuyển)
 
@@ -728,6 +810,9 @@
 | SC-ORD-028 | Khung giờ (NEED + OFFER) phải cách nhau tối thiểu 30 phút (⚠ NEW 2026-07-28) | Wizard — Bước 2/3; Đăng tin OFFER | Thời gian | REQ-ORD-012 | DOC-v1.0-01 (BRD v3.2 §D8.1/D8.2) | Đang điền khung giờ/thời gian di chuyển | Nhập khoảng cách <30 phút (vd 17:00–17:15) hoặc "đến" ≤ "từ" | Bị chặn/báo lỗi; nhập đúng biên (=30 phút) → hợp lệ | P2 | Business Rule | NEW |
 | SC-ORD-029 | Tự động cắt khoảng trắng + chuẩn hoá SĐT trước khi lưu (VAL-03, ⚠ NEW 2026-07-28) | Wizard — Bước 2/3; Đăng tin OFFER | Người gửi, Người nhận | REQ-ORD-013 | DOC-v1.0-01 (BRD v3.2 §D8.3) | Nhập text có khoảng trắng đầu/cuối thừa, hoặc SĐT có khoảng trắng/dấu chấm | Lưu/submit | Dữ liệu lưu đã được trim khoảng trắng; SĐT chuẩn hoá về định dạng số thuần trước khi lưu | P3 | Business Rule | NEW |
 | SC-ORD-030 | Nút submit vô hiệu hoá tới khi hợp lệ; lỗi hiện inline on-blur; cuộn tới lỗi đầu tiên khi submit (VAL-01/02, ⚠ NEW 2026-07-28) | Wizard — Bước 1/3, 2/3, 3/3; Đăng tin OFFER | Form thông tin hàng, Người gửi, Người nhận, Tóm tắt & điều khoản | REQ-ORD-013 | DOC-v1.0-01 (BRD v3.2 §D8.3) | Form còn field bắt buộc chưa hợp lệ hoặc chưa tick điều khoản | Rời khỏi ô nhập lỗi (blur) hoặc bấm nút submit khi còn lỗi | Lỗi hiện ngay dưới ô (inline, không popup); nút submit disabled tới khi hợp lệ hết; bấm submit khi còn lỗi → cuộn tới ô lỗi đầu tiên | P2 | UI | NEW |
+| SC-ORD-031 | Địa chỉ lấy hàng (Người gửi) — gõ text hiện gợi ý, PHẢI chọn từ danh sách (không lưu tự do), không phân biệt hoa/thường (⚠ NEW 2026-07-29) | Wizard — Bước 2/3 | Người gửi (địa điểm) | REQ-ORD-014 | Quan sát thực tế app | Ở Bước 2/3, field Địa chỉ lấy hàng | Gõ text khớp 1 phần tên văn phòng (chữ hoa lẫn chữ thường) rồi CHỌN 1 item trong gợi ý; case negative: gõ text nhưng KHÔNG chọn | Hệ thống hiển thị danh sách gợi ý khớp từ DB, kết quả giống nhau bất kể hoa/thường; field chỉ nhận giá trị khi đã CHỌN — gõ xong không chọn thì bị chặn khi qua bước tiếp | P2 | Functional | NEW |
+| SC-ORD-032 | Địa chỉ giao hàng (Người nhận) — gõ text hiện gợi ý, PHẢI chọn từ danh sách (không lưu tự do), không phân biệt hoa/thường (⚠ NEW 2026-07-29) | Wizard — Bước 2/3 | Người nhận | REQ-ORD-014 | Quan sát thực tế app | Ở Bước 2/3, field Địa chỉ giao hàng | Gõ text khớp 1 phần tên văn phòng (chữ hoa lẫn chữ thường) rồi CHỌN 1 item trong gợi ý; case negative: gõ text nhưng KHÔNG chọn | Hệ thống hiển thị danh sách gợi ý khớp từ DB, kết quả giống nhau bất kể hoa/thường (cơ chế giống hệt Địa chỉ lấy hàng); field chỉ nhận giá trị khi đã CHỌN — gõ xong không chọn thì bị chặn khi qua bước tiếp | P2 | Functional | NEW |
+| SC-ORD-033 | Check đầy đủ hiển thị Trang chủ: Header + Banner + Card "Đóng góp của bạn" + nút "Xem bảng tin gửi hàng" + bottom nav (completeness) (⚠ NEW 2026-07-29) | Trang chủ | Header, Banner quảng bá & Card "Đóng góp của bạn", Bottom nav | REQ-ORD-015 | DOC-v1.0-02 | Đã đăng nhập, đang ở màn Trang chủ | Quan sát toàn bộ màn Trang chủ từ trên xuống | Hiển thị đủ: Header (icon vai trò + "Xin chào, [Tên]" + chuông thông báo), Banner "Tiện đường — Giúp đồng nghiệp" + logo "FOX ECO", Card "Đóng góp của bạn" (số đơn đã giúp + số liệu cộng đồng), nút "Xem bảng tin gửi hàng", bottom nav đủ 5 tab với tab "Trang chủ" đang active | P3 | UI | NEW |
 
 #### Source Detail per Scenario
 
@@ -750,6 +835,14 @@
 ##### SC-ORD-010..012 — Địa điểm & auto-fill người nhận
 **Source Quote:** see `MEMORY.md §4.1 REQ-ORD-007/008`.
 **Analyst Note:** SC-ORD-010 (LOC-03) không có bằng chứng UI trong demo — chỉ có trong BRD, generate-tc cần thận trọng khi chưa vibe-test xác nhận UI thật có quick-select hay không.
+
+##### SC-ORD-031..032 — Autocomplete địa chỉ văn phòng theo text nhập (⚠ NEW 2026-07-29)
+**Source Quote:** see `MEMORY.md §4.1 REQ-ORD-014`.
+**Analyst Note:** Khác với SC-ORD-010 (quick-select cố định 6 preset, kích hoạt bằng nút riêng), đây là live search: gõ text tự do vào chính field địa chỉ → hệ thống trả gợi ý khớp từ DB, không phân biệt hoa/thường. Áp dụng đồng thời cho Địa chỉ lấy hàng (Người gửi, SC-ORD-031) và Địa chỉ giao hàng (Người nhận, SC-ORD-032) — cùng 1 cơ chế, tách 2 scenario để trace theo đúng 2 block khác nhau. Nguồn 100% từ quan sát thực tế app STG qua chat, chưa có bằng chứng tài liệu.
+
+##### SC-ORD-033 — Completeness màn Trang chủ (⚠ NEW 2026-07-29)
+**Source Quote:** see `MEMORY.md §4.1 REQ-ORD-015`.
+**Analyst Note:** Bổ sung theo cùng pattern Step 3b (Field/Column completeness) đã dùng cho SC-USR-006 (header Cá nhân) và SC-ORD-025 (bottom nav Hoạt động) — trước đó màn Trang chủ chỉ có scenario cho 2 block con "Đơn của tôi"/"Tin mới" (SC-ORD-003/004, tham chiếu SC-ASN-005/008/010), CHƯA có scenario nào verify toàn bộ cấu trúc khung màn (Header/Banner/Card/nút/bottom-nav). Nguồn: `DOC-v1.0-02 §2` (bảng "Thành phần chung") + `§3.1` — đã có sẵn trong tài liệu từ đầu (DOC-v1.0-02 đăng ký từ INIT 2026-07-24), chỉ chưa được capture thành Block Definition/scenario riêng. **Chưa có cross-check ảnh Figma (DOC-v1.0-04) cụ thể cho các field Header/Banner/Card này** — theo Project_rule.md §10.1, generate-tc CÓ THỂ viết TC cho field đã có bằng chứng tài liệu rõ ràng (DOC-v1.0-02, PRD dựng từ thao tác trực tiếp bản demo), nhưng nên ưu tiên vibe-test/xác nhận qua ảnh Figma hoặc app STG thật trước khi coi Expected Result là final — nếu phát hiện lệch, cập nhật lại như các block khác đã từng làm (vd Block "2 lựa chọn" màn Đăng tin mới).
 
 ##### SC-ORD-013..014 — Giá trị hàng (cảnh báo categorical) & hàng cấm
 **Source Quote:** see `MEMORY.md §4.1 REQ-ORD-009/012`.
@@ -779,6 +872,8 @@
 | SC-ASN-010 | Ưu tiên gợi ý theo độ gần rồi thời gian đăng | Trang chủ, Bảng tin | — | REQ-ASN-007 | DOC-v1.0-01 | Có nhiều tin cùng phù hợp tuyến Carrier | Xem danh sách gợi ý | Sắp xếp: gần tuyến nhất trước, cùng độ gần → tin mới đăng trước | P2 | Business Rule | NEW |
 | SC-ASN-011 | Không tự khớp với chính mình | Chi tiết tin | Nút hành động vận chuyển | REQ-ASN-008 | DOC-v1.0-01 | Tin do chính user đăng (Sender) hoặc user là Người nhận của đơn | User đó mở Chi tiết tin của đơn đó | Nút "Tôi mang giúp được" ẨN/disable (C-ASN-02, Resolved 2026-07-27 — rule chính thức xác nhận; regression test vì demo hiện tại có thể vi phạm) | P1 | Business Rule | NEW |
 | SC-ASN-012 | Tin huỷ bởi Carrier quay lại "Chờ ghép" và khớp lại | Bảng tin | — | REQ-ASN-009 | DOC-v1.0-01 | Carrier huỷ đơn ở trạng thái MATCHED (chưa lấy hàng) | Xác nhận huỷ | Đơn về POSTED, hiện lại Bảng tin, được đưa lại vào luồng khớp | P2 | Business Rule | NEW |
+| SC-ASN-013 | Hệ thống chỉ bắn tối đa 5 thông báo khớp tin cho Carrier (⚠ NEW 2026-07-29) | Thông báo (push/in-app) | — | REQ-ASN-005 | DOC-v1.0-01, BA xác nhận qua chat | Carrier đã đăng OFFER, hệ thống quét khớp thấy >5 tin NEED phù hợp tuyến cùng lúc | Hệ thống chạy vòng quét khớp | Carrier chỉ NHẬN được tối đa 5 thông báo khớp tin (mới & gần tuyến nhất) — không bắn thêm thông báo cho các tin phù hợp còn lại dù có >5 kết quả khớp | P2 | Business Rule | NEW |
+| SC-ASN-014 | Bảng tin hiển thị đủ card list (icon/loại hàng-giá trị/badge "Tin của bạn"/thời gian/Nhận-Giao/khung giờ) + bấm mở Chi tiết tin (completeness) (⚠ NEW 2026-07-29) | Bảng tin | Danh sách tin đăng | REQ-ASN-010 | DOC-v1.0-02 | Đã đăng nhập, đang ở màn Bảng tin, có ≥1 tin trong danh sách (bao gồm ≥1 tin do chính user đăng) | Quan sát toàn bộ danh sách + bấm vào 1 card | Mỗi card hiển thị đủ: icon/ảnh hàng, loại hàng \| giá trị, thời gian đăng, "Nhận:"/"Giao:" rút gọn, khung giờ; card của tin do chính user đăng có thêm badge "Tin của bạn", card của người khác KHÔNG có badge này; bấm vào 1 card mở đúng màn Chi tiết tin | P3 | UI | NEW |
 
 #### Source Detail per Scenario
 
@@ -794,9 +889,19 @@
 **Source Quote:** see `MEMORY.md §4.1 REQ-ASN-005/006/007`.
 **Analyst Note:** **Update 2026-07-27 (C-NTF-02, Partially Resolved):** BA/PO xác nhận khớp tuyến = trùng ĐỊA CHỈ GIAO HÀNG đã chọn + khung giờ phù hợp (không dùng bán kính GPS). SC-ASN-009 test rõ ràng "cùng địa chỉ chính xác" vs "khác địa chỉ hẳn"; vẫn defer BVA cho "khung giờ phù hợp" (độ lệch cho phép) tới khi BA chốt thêm.
 
+##### SC-ASN-013 — Trần thông báo khớp tin (⚠ NEW 2026-07-29)
+**Source Quote:** see `MEMORY.md §4.1 REQ-ASN-005` (Update 2026-07-29).
+**Analyst Note:** Tách riêng khỏi SC-ASN-008 vì khác bề mặt kiểm thử: SC-ASN-008 verify UI Trang chủ hiển thị đúng tối đa 5 tin (US-D06); SC-ASN-013 verify hành vi bắn thông báo thực tế (đếm số notification Carrier nhận được sau 1 vòng quét khớp, phải ≤5 dù có nhiều hơn 5 tin đủ điều kiện khớp) — đúng câu chữ BA vừa nhấn mạnh lại qua chat.
+
+**Update 2026-07-29 (BA xác nhận, làm rõ thêm — huỷ giả định trước đó):** Trước đó (cùng ngày) có ghi nhận OPR-01 và OPR-06 là "2 rule độc lập, có thể cộng dồn" — **giả định này SAI**, BA đã xác nhận lại: **KHÔNG tồn tại ngưỡng theo ngày (OPR-06) trong hành vi triển khai thực tế**, chỉ có trần theo TỪNG TIN (OPR-01 = SC-ASN-013). Đăng N tin OFFER (mỗi tin ≥5 match) → tối đa 5×N thông báo, không có mốc chặn theo ngày. **`SC-NTF-006` (OPR-06) coi như DEPRECATED** — xem note tại SC-NTF-006 bên dưới. 3 TC test cho SC-ASN-013 đã được viết vào `TC-NTF-v1.0.xlsx` (`TC_03.1-3`, đặt ở sheet NTF vì cùng bề mặt "màn Thông báo" dù scenario gốc thuộc module ASN).
+
 ##### SC-ASN-011..012 — Chống tự khớp + vòng đời tin khi huỷ
 **Source Quote:** see `MEMORY.md §4.1 REQ-ASN-008/009`.
 **Analyst Note:** SC-ASN-011 là regression quan trọng — bằng chứng thực tế (docx Table 17 #9) cho thấy bản hiện tại VI PHẠM rule này; **C-ASN-02 Resolved 2026-07-27** (BA/PO xác nhận rule chính thức = cấm tự nhận).
+
+##### SC-ASN-014 — Completeness màn Bảng tin (⚠ NEW 2026-07-29)
+**Source Quote:** see `MEMORY.md §4.1 REQ-ASN-010`.
+**Analyst Note:** Trước đây màn Bảng tin CHƯA có Block Definition/scenario completeness riêng — chỉ có 3 scenario business-rule tham chiếu tên màn (SC-ASN-005 tin ẩn sau ghép, SC-ASN-010 thứ tự ưu tiên, SC-ASN-012 tin quay lại sau huỷ), không scenario nào verify cấu trúc hiển thị của card trong danh sách. Nguồn `DOC-v1.0-02 §3.3` đã có sẵn từ INIT (2026-07-24), chỉ chưa được capture. Given cố ý gồm cả tin do chính user đăng để verify đồng thời 2 nhánh badge "Tin của bạn" (có/không) trong 1 TC — tránh tách thêm scenario riêng cho badge vì cùng 1 field, khác giá trị boolean. **Lưu ý liên hệ SC-ASN-011:** ghi chú gốc trong DOC-v1.0-02 §3.3 (xem block "Screen: Bảng tin" phía trên) mô tả 1 gap cũ của bản demo (nút "Tôi mang giúp được" không ẩn đúng cho chủ tin) — KHÔNG phải phạm vi của SC-ASN-014 (SC-ASN-014 chỉ test hiển thị card trong danh sách, không test nút hành động ở Chi tiết tin).
 
 ### DLV — Thực hiện giao hàng
 
@@ -901,7 +1006,7 @@
 | SC-NTF-003 | Thông báo theo mốc vận chuyển | Thông báo | Nội dung theo sự kiện | REQ-NTF-001 | DOC-v1.0-01 | Carrier lần lượt bấm "Tôi đã lấy hàng" → "Đã giao" → Receiver "Xác nhận đã nhận" | Kiểm tra thông báo mỗi bước | NTF-04 (lấy hàng) → NTF-05 (đã giao) → NTF-06 (hoàn tất) gửi đúng người nhận | P2 | Functional | NEW |
 | SC-NTF-004 | Thông báo khi nhận quà cảm ơn | Thông báo | Nội dung theo sự kiện | REQ-NTF-001 | DOC-v1.0-01 | Sender vừa gửi quà cảm ơn | Kiểm tra thông báo | Carrier nhận NTF-07 ("Bạn nhận được một món quà cảm ơn 🎁") | P3 | Functional | NEW |
 | SC-NTF-005 | Thông báo khi huỷ đơn / tin quá hạn | Thông báo | Nội dung theo sự kiện | REQ-NTF-001 | DOC-v1.0-01 | (a) Đơn bị huỷ kèm lý do, hoặc (b) tin quá hạn chưa ghép | Kiểm tra thông báo | (a) Các bên còn lại nhận NTF-08 kèm lý do + vai trò người huỷ; (b) Người đăng tin nhận NTF-09 | P2 | Functional | NEW |
-| SC-NTF-006 | Trần thông báo khớp/ngày | Thông báo | — | REQ-NTF-002 | DOC-v1.0-01 | Carrier đã nhận số lượng thông báo khớp = ngưỡng cấu hình trong ngày | Có thêm 1 tin mới khớp | Không bắn thêm thông báo (đã đạt trần) — ngưỡng cụ thể vẫn Open (C-NTF-02, Partially Resolved 2026-07-27 — cơ chế match đã chốt, nhưng chu kỳ quét/ngưỡng gộp vẫn chưa có số) | P3 | Business Rule | NEW |
+| SC-NTF-006 | Trần thông báo khớp/ngày (⚠ DEPRECATED 2026-07-29 — BA xác nhận không có ngưỡng ngày, xem SC-ASN-013 thay thế) | Thông báo | — | REQ-NTF-002 | DOC-v1.0-01 | Carrier đã nhận số lượng thông báo khớp = ngưỡng cấu hình trong ngày | Có thêm 1 tin mới khớp | ~~Không bắn thêm thông báo (đã đạt trần)~~ — SUPERSEDED, không còn áp dụng | P3 | Business Rule | DEPRECATED |
 | SC-NTF-007 | Empty state khi chưa có thông báo nào | Thông báo | Empty state | REQ-NTF-001 | Quan sát thực tế app | Chưa có thông báo nào (nhóm Hôm nay/Hôm qua đều rỗng) | Mở màn Thông báo | Hiển thị text "Hiện tại chưa có dữ liệu" (mở rộng phạm vi C-ORD-06, Resolved) | P3 | UI | NEW |
 | SC-NTF-008 | Đánh dấu đã đọc (tap 1 thông báo / nút mark-all) | Thông báo | Đánh dấu đã đọc | REQ-NTF-001 | DOC-v1.0-04 / Quan sát thực tế app | Có ≥1 thông báo chưa đọc (chấm đỏ) | (a) Tap vào 1 thông báo cụ thể, HOẶC (b) bấm nút "Đánh dấu đã đọc" ở header | (a) CHỈ thông báo được tap chuyển đã đọc, các thông báo khác giữ nguyên; (b) TẤT CẢ thông báo chuyển đã đọc cùng lúc (C-NTF-03, Resolved — QA xác nhận đúng cơ chế thật) | P3 | Functional | NEW |
 | SC-NTF-009 | Scroll xuống load thêm dữ liệu (phân trang) | Thông báo | Load thêm dữ liệu (Scroll / Pagination) | REQ-NTF-001 | Quan sát thực tế app | Danh sách thông báo có nhiều hơn 1 "trang" dữ liệu | Scroll xuống cuối danh sách đang hiển thị | Tự động load thêm thông báo cũ hơn, không trùng lặp, không mất data; khi hết data không load lặp lại (C-NTF-03, Resolved — QA xác nhận đúng cơ chế thật) | P3 | Functional | NEW |
@@ -910,7 +1015,7 @@
 
 ##### SC-NTF-001..006 — Thông báo theo sự kiện vòng đời
 **Source Quote:** see `MEMORY.md §4.1 REQ-NTF-001/002`.
-**Analyst Note:** Toàn bộ nội dung message trong bảng D6 được doc tự đánh dấu "Nháp — chờ BA review & bổ sung" — SC hiện tại dùng làm baseline, generate-tc cần re-sync nếu nội dung đổi sau khi BA duyệt. **Update 2026-07-27:** đã bổ sung bảng unified 3 nguồn (BRD/Demo/Figma) tại `MEMORY.md §6.1 C-NTF-01` để BA chọn danh sách chính thức — vẫn Open. SC-NTF-006 ngưỡng cụ thể (chu kỳ quét/ngưỡng gộp) vẫn Open dù C-NTF-02 đã Partially Resolved (cơ chế match tuyến đã chốt).
+**Analyst Note:** Toàn bộ nội dung message trong bảng D6 được doc tự đánh dấu "Nháp — chờ BA review & bổ sung" — SC hiện tại dùng làm baseline, generate-tc cần re-sync nếu nội dung đổi sau khi BA duyệt. **Update 2026-07-27:** đã bổ sung bảng unified 3 nguồn (BRD/Demo/Figma) tại `MEMORY.md §6.1 C-NTF-01` để BA chọn danh sách chính thức — vẫn Open. ~~SC-NTF-006 ngưỡng cụ thể (chu kỳ quét/ngưỡng gộp) vẫn Open dù C-NTF-02 đã Partially Resolved~~ — **Update 2026-07-29:** BA xác nhận KHÔNG có ngưỡng ngày, SC-NTF-006 DEPRECATED, xem SC-ASN-013 (`MEMORY.md §4.1 REQ-ASN-005`).
 
 ##### SC-NTF-007 — Empty state danh sách thông báo — NEW 2026-07-27
 **Source Quote:** — (không có nguồn tài liệu gốc — tái dùng text đã dùng ở SC-ORD-023/SC-GIFT-006, xem block "Empty state" phía trên; QA GiangDC2 xác nhận trực tiếp trên UI thật 2026-07-28).

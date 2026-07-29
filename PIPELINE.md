@@ -57,8 +57,8 @@ health-check: cross-cutting, chạy bất kỳ lúc nào để đối chiếu co
 | 1 | init-project | v1.0 | ✅ COMPLETED |
 | 2 | create-test-plan | — | ⬜ NOT_STARTED |
 | 3 | analyze-requirements | v1.0 | ✅ COMPLETED — 2026-07-24, 40 REQ/62 SC (8 module), 16 clarification (1 BLOCKER cứng còn lại: C-ORD-02 — C-USR-01/C-DLV-01/C-GIFT-01 đã Resolved/Partially Resolved — xem `02_analyze-requirements/v1.0/MEMORY.md §6`) |
-| 4 | generate-tc | — | ⬜ NOT_STARTED |
-| 5 | review-tc | — | ⬜ NOT_STARTED |
+| 4 | generate-tc | v1.0 | ✅ COMPLETED — 175 TC / 4 sheet (xem MASTER-MEMORY §8 §4 để có chi tiết) |
+| 5 | review-tc | v1.0 | ✅ COMPLETED, score gốc 70/100 → ~91/100 sau fix — 3/4 Critical + 2/3 Major + 1/1 Minor đã fix trực tiếp; còn lại: CNL/Huỷ đơn (chủ động skip, QC khác phụ trách), REQ-NTF-002 OPR-07 (cần generate-tc riêng). Xem MASTER-MEMORY §8 §5 + `11_tc-review/review-report-v1.0.md` |
 | 6 | scan-source-code | — | N/A (no automation) |
 | 7 | implement-automation | — | N/A (no automation) |
 | 8 | review-src-tc | — | N/A (no automation) |
