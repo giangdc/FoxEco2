@@ -77,7 +77,7 @@
 |---|-------------------|------------|
 | 1 | Nhãn hướng | "Gửi:" (Sender) / "Nhận:" (Receiver) |
 | 2 | Loại hàng \| giá trị | Hiển thị tóm tắt |
-| 3 | Badge trạng thái | Chờ ghép/Đã ghép/Đang giao/Đã giao/Hoàn thành |
+| 3 | Badge trạng thái | Chờ ghép/Đã ghép/Đang giao/Đã giao/Hoàn thành/**Đã huỷ** (⚠ bổ sung 2026-07-30 — user xác nhận: đơn Đã huỷ vẫn hiện card, không ẩn section) |
 | 4 | Từ:/Đến: | Điểm lấy → điểm giao rút gọn |
 | 5 | Thanh progress 5 bước | Khớp 5 mốc trạng thái |
 | 6 | "Chạm để theo dõi đơn" | Mở màn Theo dõi đơn |
@@ -86,6 +86,8 @@
 > "Đơn của tôi | Chỉ hiện khi có đơn đang hoạt động. Nhãn 'Gửi:' + loại hàng | giá trị; badge trạng thái (Chờ ghép/Đã ghép/Đang giao/Đã giao/Hoàn thành); 'Từ:' / 'Đến:'; thanh progress 5 bước; 'Chạm để theo dõi đơn của bạn'"
 
 **Source Location:** `DOC-v1.0-02 §3.1 "Màn hình Trang chủ" · Table 3`
+
+**Update 2026-07-30 (user xác nhận qua chat, đồng bộ theo finding tại module Hoạt động):** Badge trạng thái bổ sung thêm **"Đã huỷ"** — đơn vừa bị huỷ (module CNL) KHÔNG làm section "Đơn của tôi" biến mất, mà tiếp tục hiện card với badge "Đã huỷ" (nhất quán với hành vi đã sửa ở `TC_01.21` màn Hoạt động, tab "Đang diễn ra"). Đã thêm `TC_05.21` + sửa Precondition `TC_05.15` cho đúng.
 
 **Scenarios liên quan:** SC-ORD-003, SC-ORD-004
 
@@ -801,10 +803,10 @@
 | SC-ORD-018 | Check đầy đủ field trên 1 card đơn (completeness) | Hoạt động (Đơn của tôi) | Card danh sách đơn | REQ-ORD-011 | Quan sát thực tế app | Có ≥1 đơn trong danh sách | Mở màn Hoạt động | Mỗi card hiển thị đủ: icon trạng thái, tên tin, tuyến (Từ→Đến), ngày, badge trạng thái | P2 | UI | NEW |
 | SC-ORD-019 | Card trạng thái "Hoàn thành" hiển thị đúng, không assert rating | Hoạt động (Đơn của tôi) | Card danh sách đơn | REQ-ORD-011 | Quan sát thực tế app | Có đơn COMPLETED, tab "Đã hoàn thành" | Mở tab "Đã hoàn thành" | Card hiện icon check xanh + badge "Hoàn thành" (KHÔNG assert dòng rating sao — C-GIFT-01 out of scope) | P3 | UI | NEW |
 | SC-ORD-020 | Card trạng thái "Chờ ghép" hiển thị tại tab "Đang diễn ra" | Hoạt động (Đơn của tôi) | Card danh sách đơn | REQ-ORD-011 | Quan sát thực tế app | Có đơn POSTED, tab "Đang diễn ra" | Mở tab "Đang diễn ra" | Card hiện đúng badge "Chờ ghép" | P3 | UI | NEW |
-| SC-ORD-021 | Tap card trạng thái khác "Hết hạn" → mở Chi tiết tin | Hoạt động (Đơn của tôi) | Card danh sách đơn | REQ-ORD-011 | Quan sát thực tế app | Có đơn trạng thái ≠ Hết hạn (vd Chờ ghép/Hoàn thành) | Tap vào card | Điều hướng đúng sang màn "Chi tiết tin" | P2 | Functional | NEW |
+| SC-ORD-021 | Tap card trạng thái khác "Hết hạn" → mở Chi tiết tin | Hoạt động (Đơn của tôi) | Card danh sách đơn | REQ-ORD-011 | Quan sát thực tế app | Có đơn trạng thái ≠ Hết hạn (vd Chờ ghép/Hoàn thành/**Đã huỷ**) | Tap vào card | Điều hướng đúng sang màn "Chi tiết tin" | P2 | Functional | NEW |
 | SC-ORD-022 | Tap card "Hết hạn" → không cho thao tác | Hoạt động (Đơn của tôi) | Card danh sách đơn | REQ-ORD-011 | Quan sát thực tế app | Có đơn EXPIRED (badge "Hết hạn") | Tap vào card | Không điều hướng, không phản hồi (non-clickable) | P3 | Business Rule | NEW |
 | SC-ORD-023 | Empty state khi danh sách rỗng (cả 2 tab) | Hoạt động (Đơn của tôi) | Card danh sách đơn | REQ-ORD-011 | Quan sát thực tế app | Tab không có đơn nào | Mở tab đó (Đang diễn ra hoặc Đã hoàn thành) | Hiển thị text "Hiện tại chưa có dữ liệu" (C-ORD-06, Resolved) | P3 | UI | NEW |
-| SC-ORD-024 | Đơn "Đã huỷ" (CNL) không hiển thị tại Hoạt động | Hoạt động (Đơn của tôi) | Card danh sách đơn | REQ-ORD-011, REQ-CNL-001 | Quan sát thực tế app | Có đơn vừa chuyển trạng thái "Đã huỷ" | Mở lần lượt cả 2 tab tại Hoạt động | Đơn "Đã huỷ" KHÔNG xuất hiện ở tab "Đang diễn ra" lẫn "Đã hoàn thành" | P2 | Business Rule | NEW |
+| SC-ORD-024 | Đơn "Đã huỷ" (CNL) hiển thị đúng tại tab "Đang diễn ra" (⚠ CORRECTED 2026-07-30 — trước đó ghi nhầm "không hiển thị") | Hoạt động (Đơn của tôi) | Card danh sách đơn | REQ-ORD-011, REQ-CNL-001 | Quan sát thực tế app | Có đơn vừa chuyển trạng thái "Đã huỷ" | Mở lần lượt cả 2 tab tại Hoạt động | Đơn "Đã huỷ" hiển thị ĐÚNG dạng card (badge "Đã huỷ") tại tab "Đang diễn ra" — bấm vào card vẫn mở được Chi tiết tin/Theo dõi đơn bình thường (giống các trạng thái khác); KHÔNG xuất hiện ở tab "Đã hoàn thành" | P2 | Business Rule | NEW |
 | SC-ORD-025 | Bottom nav đủ 5 tab, "Hoạt động" highlight đúng | Hoạt động (Đơn của tôi) | — | REQ-ORD-011 | Quan sát thực tế app | Đang ở màn Hoạt động | Quan sát bottom nav | Đủ 5 tab (Trang chủ/Bảng tin/[+]Đăng tin/Hoạt động/Cá nhân); tab "Hoạt động" highlight màu cam (active) | P3 | UI | NEW |
 | SC-ORD-027 | Giới hạn ký tự tối đa các trường text + định dạng/kích thước ảnh sản phẩm (⚠ NEW 2026-07-28) | Wizard — Bước 1/3, 2/3 | Form thông tin hàng, Người gửi, Người nhận | REQ-ORD-012 | DOC-v1.0-01 (BRD v3.2 §D8.1/D8.2) | Đang điền form (NEED hoặc OFFER) | Nhập vượt maxlength (Ghi chú >300, Địa chỉ >200, Tên người nhận >60) hoặc tải ảnh >5MB/sai định dạng | Bị chặn/báo lỗi đúng theo giới hạn field; nhập đúng biên (300/200/60/2 ký tự, ảnh ≤5MB JPG/PNG) → hợp lệ | P3 | Business Rule | NEW |
 | SC-ORD-028 | Khung giờ (NEED + OFFER) phải cách nhau tối thiểu 30 phút (⚠ NEW 2026-07-28) | Wizard — Bước 2/3; Đăng tin OFFER | Thời gian | REQ-ORD-012 | DOC-v1.0-01 (BRD v3.2 §D8.1/D8.2) | Đang điền khung giờ/thời gian di chuyển | Nhập khoảng cách <30 phút (vd 17:00–17:15) hoặc "đến" ≤ "từ" | Bị chặn/báo lỗi; nhập đúng biên (=30 phút) → hợp lệ | P2 | Business Rule | NEW |
@@ -813,6 +815,9 @@
 | SC-ORD-031 | Địa chỉ lấy hàng (Người gửi) — gõ text hiện gợi ý, PHẢI chọn từ danh sách (không lưu tự do), không phân biệt hoa/thường (⚠ NEW 2026-07-29) | Wizard — Bước 2/3 | Người gửi (địa điểm) | REQ-ORD-014 | Quan sát thực tế app | Ở Bước 2/3, field Địa chỉ lấy hàng | Gõ text khớp 1 phần tên văn phòng (chữ hoa lẫn chữ thường) rồi CHỌN 1 item trong gợi ý; case negative: gõ text nhưng KHÔNG chọn | Hệ thống hiển thị danh sách gợi ý khớp từ DB, kết quả giống nhau bất kể hoa/thường; field chỉ nhận giá trị khi đã CHỌN — gõ xong không chọn thì bị chặn khi qua bước tiếp | P2 | Functional | NEW |
 | SC-ORD-032 | Địa chỉ giao hàng (Người nhận) — gõ text hiện gợi ý, PHẢI chọn từ danh sách (không lưu tự do), không phân biệt hoa/thường (⚠ NEW 2026-07-29) | Wizard — Bước 2/3 | Người nhận | REQ-ORD-014 | Quan sát thực tế app | Ở Bước 2/3, field Địa chỉ giao hàng | Gõ text khớp 1 phần tên văn phòng (chữ hoa lẫn chữ thường) rồi CHỌN 1 item trong gợi ý; case negative: gõ text nhưng KHÔNG chọn | Hệ thống hiển thị danh sách gợi ý khớp từ DB, kết quả giống nhau bất kể hoa/thường (cơ chế giống hệt Địa chỉ lấy hàng); field chỉ nhận giá trị khi đã CHỌN — gõ xong không chọn thì bị chặn khi qua bước tiếp | P2 | Functional | NEW |
 | SC-ORD-033 | Check đầy đủ hiển thị Trang chủ: Header + Banner + Card "Đóng góp của bạn" + nút "Xem bảng tin gửi hàng" + bottom nav (completeness) (⚠ NEW 2026-07-29) | Trang chủ | Header, Banner quảng bá & Card "Đóng góp của bạn", Bottom nav | REQ-ORD-015 | DOC-v1.0-02 | Đã đăng nhập, đang ở màn Trang chủ | Quan sát toàn bộ màn Trang chủ từ trên xuống | Hiển thị đủ: Header (icon vai trò + "Xin chào, [Tên]" + chuông thông báo), Banner "Tiện đường — Giúp đồng nghiệp" + logo "FOX ECO", Card "Đóng góp của bạn" (số đơn đã giúp + số liệu cộng đồng), nút "Xem bảng tin gửi hàng", bottom nav đủ 5 tab với tab "Trang chủ" đang active | P3 | UI | NEW |
+| SC-ORD-034 | Icon quay lại tại màn Chi tiết tin (⚠ NEW 2026-07-30) | Chi tiết tin | — | REQ-ORD-001 | Quan sát thực tế app STG | Đang ở màn Chi tiết tin | Bấm icon quay lại (header) | Quay về đúng màn đã mở Chi tiết tin từ đó (Bảng tin hoặc Trang chủ) | P3 | UI | NEW |
+| SC-ORD-035 | Icon quay lại/đóng tại màn "Đăng tin mới" (⚠ NEW 2026-07-30) | Đăng tin mới (chọn vai trò) | — | REQ-ORD-001, REQ-ORD-002 | Quan sát thực tế app STG | Đang ở màn "Đăng tin mới" | Bấm icon quay lại/đóng (header) | Quay về đúng Trang chủ | P3 | UI | NEW |
+| SC-ORD-036 | Icon quay lại/đóng tại Wizard đăng tin — Bước 1/3 (⚠ NEW 2026-07-30) | Wizard đăng tin — Bước 1/3 | — | REQ-ORD-002 | Quan sát thực tế app STG | Đang ở Bước 1/3 (vừa vào từ "Đăng tin mới") | Bấm icon quay lại/đóng (header) | Quay về đúng màn "Đăng tin mới" (thoát hẳn khỏi wizard, khác nút "Quay lại" giữa các bước — xem SC-ORD-006/007) | P3 | UI | NEW |
 
 #### Source Detail per Scenario
 
@@ -830,7 +835,7 @@
 
 ##### SC-ORD-008..009 — Chỉnh sửa tin
 **Source Quote:** see `MEMORY.md §4.1 REQ-ORD-006`.
-**Analyst Note:** Mốc khoá là MATCHED (khớp 3/3 nguồn BR-EDIT-01/OPR-10/ORD-10), không phải IN_TRANSIT như US-D19 AC có thể gây hiểu lầm — xem Analyst Note tại REQ-ORD-006.
+**Analyst Note:** Mốc khoá là MATCHED (khớp 3/3 nguồn BR-EDIT-01/OPR-10/ORD-10), không phải IN_TRANSIT như US-D19 AC có thể gây hiểu lầm — xem Analyst Note tại REQ-ORD-006. **Cập nhật 2026-07-30 (user yêu cầu, đóng gap phát hiện khi quét lại toàn bộ TC-MASTER):** enumeration test cho SC-ORD-009 trước đó chỉ có 4/5 trạng thái khoá (MATCHED/IN_TRANSIT/COMPLETED/EXPIRED), thiếu **CANCELLED** — đã bổ sung `TC_04.110`. Giả định tin đã huỷ không thể chỉnh sửa dựa trên suy luận logic (chưa có bằng chứng UI trực tiếp) — cần vibe-test xác nhận.
 
 ##### SC-ORD-010..012 — Địa điểm & auto-fill người nhận
 **Source Quote:** see `MEMORY.md §4.1 REQ-ORD-007/008`.
@@ -854,7 +859,7 @@
 
 ##### SC-ORD-015..026 — Màn Hoạt động (Đơn của tôi) — NEW 2026-07-27
 **Source Quote:** see block "Screen: Hoạt động (Đơn của tôi)" ở trên (Quan sát thực tế app STG, QA GiangDC2, 2026-07-27).
-**Analyst Note:** Toàn bộ 12 scenario derive từ 1 ảnh chụp màn hình thật + trả lời trực tiếp qua chat (không có trong BRD/PRD/Figma) — theo đúng tiền lệ SC-DLV-012..014/SC-GIFT-004 (ma trận nhãn nút, cũng nguồn "Quan sát thực tế app"). SC-ORD-019 lưu ý KHÔNG assert "★★★★★ Đã đánh giá" (rating) xuất hiện trên card Hoàn thành — coi là UI leftover theo quyết định C-GIFT-01 (out of scope v1.0). SC-ORD-024 là điểm giao thoa với module CNL (đơn "Đã huỷ" biến mất khỏi Hoạt động) — nếu sau này CNL có thêm biến thể huỷ mới, cần rà lại SC này có còn đúng không. **Cập nhật (bổ sung #5):** SC-ORD-017 tách thành 2 scenario riêng theo Project_rule.md §10.2 (mỗi tab data 1 TC riêng) — SC-ORD-017 ("Đang diễn ra") + SC-ORD-026 mới ("Đã hoàn thành").
+**Analyst Note:** Toàn bộ 12 scenario derive từ 1 ảnh chụp màn hình thật + trả lời trực tiếp qua chat (không có trong BRD/PRD/Figma) — theo đúng tiền lệ SC-DLV-012..014/SC-GIFT-004 (ma trận nhãn nút, cũng nguồn "Quan sát thực tế app"). SC-ORD-019 lưu ý KHÔNG assert "★★★★★ Đã đánh giá" (rating) xuất hiện trên card Hoàn thành — coi là UI leftover theo quyết định C-GIFT-01 (out of scope v1.0). SC-ORD-024 là điểm giao thoa với module CNL. **⚠ CORRECTED 2026-07-30 (user xác nhận trực tiếp trên app STG qua chat):** nhận định ban đầu "đơn Đã huỷ biến mất khỏi Hoạt động" là SAI — thực tế đơn "Đã huỷ" VẪN hiển thị dạng card tại tab "Đang diễn ra" (chỉ không xuất hiện ở tab "Đã hoàn thành"), và card này CÓ bấm được (mở Chi tiết tin/Theo dõi đơn) giống các trạng thái khác — khác với card "Hết hạn" (non-clickable, SC-ORD-022). Đã sửa `SC-ORD-024` + `TC_01.4` (bổ sung "Đã huỷ" vào bộ dữ liệu trộn tab "Đang diễn ra") + `TC_01.21` (cũ `TC_01.20`, viết lại theo hướng "CÓ hiển thị") + thêm `TC_01.17` mới (click behavior, gộp vào `SC-ORD-021`). Nếu sau này CNL có thêm biến thể huỷ mới, cần rà lại SC này có còn đúng không. **Cập nhật (bổ sung #5):** SC-ORD-017 tách thành 2 scenario riêng theo Project_rule.md §10.2 (mỗi tab data 1 TC riêng) — SC-ORD-017 ("Đang diễn ra") + SC-ORD-026 mới ("Đã hoàn thành").
 
 ### ASN — Ghép nối
 
@@ -864,7 +869,7 @@
 | SC-ASN-002 | Ghép ngay khi Carrier xác nhận | Modal xác nhận mang giúp | Xác nhận 2 nút | REQ-ASN-002 | DOC-v1.0-01, DOC-v1.0-02 | Modal "Xác nhận mang giúp" đang mở | Bấm Xác nhận | Đơn chuyển MATCHED ngay (không cần Sender duyệt riêng), lộ SĐT 2 bên, cả 3 khung đổi trạng thái tức thời | P1 | Business Rule | NEW |
 | SC-ASN-003 | SĐT không lộ trước khi ghép | Chi tiết tin | Lộ trình & liên hệ | REQ-ASN-002 | DOC-v1.0-01 | Tin đang "Chờ ghép", chưa có ai xác nhận mang giúp | Người khác xem Chi tiết tin | SĐT Người gửi KHÔNG hiển thị (C-ASN-01, Resolved 2026-07-27 — rule chính thức xác nhận; regression test vì demo hiện tại có thể vi phạm) | P1 | Business Rule | NEW |
 | SC-ASN-004 | Chống double-accept | Chi tiết tin | Nút hành động vận chuyển | REQ-ASN-003 | DOC-v1.0-01 | 2 Carrier khác nhau cùng mở Chi tiết tin 1 tin "Chờ ghép" | Cả 2 bấm "Tôi mang giúp được" gần như đồng thời | Chỉ 1 người ghép thành công (transaction lock); người còn lại nhận thông báo tin đã có người nhận | P1 | Business Rule | NEW |
-| SC-ASN-005 | Tin ẩn khỏi Bảng tin sau khi ghép | Bảng tin | — | REQ-ASN-003, REQ-ASN-009 | DOC-v1.0-01 | Tin vừa chuyển MATCHED | Carrier khác mở Bảng tin | Tin không còn xuất hiện; không ai bấm "Tôi mang giúp được" được nữa | P1 | Business Rule | NEW |
+| SC-ASN-005 | Tin ẩn khỏi Bảng tin sau khi rời "Chờ ghép" (ghép/hết hạn/huỷ, ⚠ mở rộng 2026-07-30) | Bảng tin | — | REQ-ASN-003, REQ-ASN-009 | DOC-v1.0-01 | Tin vừa chuyển MATCHED, hoặc tự động EXPIRED, hoặc bị Sender CANCELLED | Carrier khác mở Bảng tin | Tin không còn xuất hiện trong danh sách công khai, bất kể lý do rời "Chờ ghép" là gì; không ai bấm "Tôi mang giúp được" được nữa | P1 | Business Rule | NEW |
 | SC-ASN-006 | Tự động khớp tuyến OFFER↔NEED | — | — | REQ-ASN-004 | DOC-v1.0-01, DOC-v1.0-02 | Carrier đã đăng tuyến OFFER, có tin NEED mới trùng điểm lấy & điểm giao | Hệ thống quét khớp | Đẩy thông báo "Tìm thấy đơn hàng phù hợp tuyến của bạn" cho Carrier | P1 | Functional | NEW |
 | SC-ASN-007 | Carrier "Nhận giao" từ thông báo khớp tuyến | Chi tiết tin | Nút hành động vận chuyển | REQ-ASN-004 | DOC-v1.0-01, DOC-v1.0-02 | Carrier bấm thông báo khớp tuyến, mở Chi tiết tin NEED phù hợp | Bấm "Nhận giao" | Ghép (MATCHED) + lộ liên hệ 2 bên + vào Theo dõi đơn | P2 | Functional | NEW |
 | SC-ASN-008 | Trần 5 tin gợi ý | Trang chủ | — | REQ-ASN-005 | DOC-v1.0-01 | Có >5 tin NEED phù hợp tuyến/khu vực Carrier | Carrier mở Trang chủ | Chỉ hiện tối đa 5 tin (mới & gần tuyến nhất) | P3 | Business Rule | NEW |
@@ -921,6 +926,7 @@
 | SC-DLV-012 | Nhãn nút Sender/Receiver đúng theo trạng thái Đã ghép/Đang giao | Theo dõi đơn — Ma trận nhãn nút theo trạng thái | Nhãn nút hành động x trạng thái x vai trò | REQ-DLV-003, REQ-DLV-006 | Quan sát thực tế app | Đơn lần lượt ở "Đã ghép" rồi "Đang giao" | Sender và Receiver mở Theo dõi đơn ở từng trạng thái | Sender thấy "Đã ghép. Chờ shipper lấy hàng" rồi "Đang giao đến người nhận" (disable); Receiver thấy "Đã có người vận chuyển" rồi "Đơn đang trên đường đến bạn" (disable) | P2 | UI | NEW |
 | SC-DLV-013 | Tại "Đã giao": Sender/Carrier cùng nhãn disable, chỉ Receiver enable | Theo dõi đơn — Ma trận nhãn nút theo trạng thái | Nhãn nút hành động x trạng thái x vai trò | REQ-DLV-003 | Quan sát thực tế app | Đơn ở "Đã giao" (DELIVERED) | Cả 3 vai trò mở Theo dõi đơn | Sender & Carrier cùng thấy nhãn "Đã giao. Chờ người nhận xác nhận" (disable); Receiver thấy "Xác nhận đã nhận hàng" (enable, duy nhất) | P1 | Business Rule | NEW |
 | SC-DLV-014 | Carrier/Receiver thấy nhãn "Đơn đã hoàn thành" sau Hoàn thành | Theo dõi đơn — Ma trận nhãn nút theo trạng thái | Nhãn nút hành động x trạng thái x vai trò | REQ-DLV-003 | Quan sát thực tế app | Đơn vừa chuyển COMPLETED | Carrier và Receiver mở lại Theo dõi đơn | Cả 2 thấy nhãn "Đơn đã hoàn thành" (disable) — không còn hành động nào khác | P3 | UI | NEW |
+| SC-DLV-015 | Icon quay lại tại màn Theo dõi đơn (⚠ NEW 2026-07-30) | Theo dõi đơn | — | REQ-DLV-003 | Quan sát thực tế app STG | Đang ở màn Theo dõi đơn | Bấm icon quay lại (header) | Quay về đúng màn Hoạt động | P3 | UI | NEW |
 
 #### Source Detail per Scenario
 
@@ -963,6 +969,7 @@
 | SC-GIFT-005 | Menu "Quà đã nhận" tại Cá nhân điều hướng đúng | Cá nhân | Menu điều hướng | REQ-USR-004 | Quan sát thực tế app | Đang ở màn Cá nhân | Bấm menu "Quà đã nhận" | Điều hướng đúng sang màn "Quà đã nhận" (màn riêng) | P3 | Functional | NEW |
 | SC-GIFT-006 | Màn "Quà đã nhận" rỗng khi chưa nhận quà nào | Quà đã nhận | Quà đã nhận (màn riêng) | REQ-GIFT-001 | Quan sát thực tế app | Carrier chưa từng nhận quà nào | Mở màn "Quà đã nhận" | Hiển thị text "Hiện tại chưa có dữ liệu" (C-ORD-06, Resolved) | P3 | UI | NEW |
 | SC-GIFT-007 | Icon quay lại tại màn "Quà đã nhận" | Quà đã nhận | Quà đã nhận (màn riêng) | REQ-GIFT-001 | Quan sát thực tế app | Đang ở màn "Quà đã nhận" | Bấm icon quay lại (header) | Quay về đúng màn trước đó (Cá nhân) | P3 | UI | NEW |
+| SC-GIFT-008 | Icon quay lại tại màn Tặng quà (⚠ NEW 2026-07-30) | Tặng quà | — | REQ-GIFT-001 | Quan sát thực tế app STG | Đang ở màn Tặng quà | Bấm icon quay lại (header) | Quay về đúng màn Theo dõi đơn | P3 | UI | NEW |
 | SC-USR-007 | Menu "Đơn của tôi" tại Cá nhân điều hướng đúng | Cá nhân | Menu điều hướng | REQ-USR-004 | Quan sát thực tế app | Đang ở màn Cá nhân | Bấm menu "Đơn của tôi" | Điều hướng đúng sang màn "Hoạt động" | P3 | Functional | NEW |
 
 > **REQ-GIFT-002 (RAT-01/02 — đánh giá 1-5 sao) không có scenario** — **Resolved — Deferred (2026-07-27)**: BA/PO xác nhận rating 1-5 sao là phase sau, out of scope v1.0, xem **C-GIFT-01** ở `MEMORY.md §6`. Không derive Given/When/Then cho tính năng này ở v1.0.
@@ -1010,6 +1017,8 @@
 | SC-NTF-007 | Empty state khi chưa có thông báo nào | Thông báo | Empty state | REQ-NTF-001 | Quan sát thực tế app | Chưa có thông báo nào (nhóm Hôm nay/Hôm qua đều rỗng) | Mở màn Thông báo | Hiển thị text "Hiện tại chưa có dữ liệu" (mở rộng phạm vi C-ORD-06, Resolved) | P3 | UI | NEW |
 | SC-NTF-008 | Đánh dấu đã đọc (tap 1 thông báo / nút mark-all) | Thông báo | Đánh dấu đã đọc | REQ-NTF-001 | DOC-v1.0-04 / Quan sát thực tế app | Có ≥1 thông báo chưa đọc (chấm đỏ) | (a) Tap vào 1 thông báo cụ thể, HOẶC (b) bấm nút "Đánh dấu đã đọc" ở header | (a) CHỈ thông báo được tap chuyển đã đọc, các thông báo khác giữ nguyên; (b) TẤT CẢ thông báo chuyển đã đọc cùng lúc (C-NTF-03, Resolved — QA xác nhận đúng cơ chế thật) | P3 | Functional | NEW |
 | SC-NTF-009 | Scroll xuống load thêm dữ liệu (phân trang) | Thông báo | Load thêm dữ liệu (Scroll / Pagination) | REQ-NTF-001 | Quan sát thực tế app | Danh sách thông báo có nhiều hơn 1 "trang" dữ liệu | Scroll xuống cuối danh sách đang hiển thị | Tự động load thêm thông báo cũ hơn, không trùng lặp, không mất data; khi hết data không load lặp lại (C-NTF-03, Resolved — QA xác nhận đúng cơ chế thật) | P3 | Functional | NEW |
+| SC-NTF-010 | Nội dung push không chứa SĐT (kiểm soát lộ liên hệ, ⚠ NEW 2026-07-30) | Thông báo (push notification) | Kiểm soát nội dung push | REQ-NTF-002 | DOC-v1.0-01 | Đơn đã MATCHED (SĐT 2 bên đã lộ TRONG APP theo REQ-ASN-002/003) | Hệ thống gửi bất kỳ push notification nào liên quan đơn này (NTF-01/02/04/05/06/08/09) | Nội dung push (title + body) hiển thị trên thiết bị KHÔNG chứa số điện thoại của bên còn lại — SĐT chỉ xem được khi mở app, không lộ qua notification | P1 | Business Rule | NEW |
+| SC-NTF-011 | Icon quay lại tại màn Thông báo (⚠ NEW 2026-07-30) | Thông báo | — | REQ-NTF-001 | Quan sát thực tế app STG | Đang ở màn Thông báo | Bấm icon quay lại (header) | Quay về đúng màn đã mở Thông báo từ đó | P3 | UI | NEW |
 
 #### Source Detail per Scenario
 
@@ -1028,6 +1037,18 @@
 ##### SC-NTF-009 — Load thêm dữ liệu khi scroll — NEW 2026-07-27
 **Source Quote:** — (không có nguồn tài liệu, xem block "Load thêm dữ liệu" phía trên).
 **Analyst Note:** User phát hiện gap khi review TC-NTF (2026-07-27): chưa có TC nào test hành vi scroll/load thêm dữ liệu khi danh sách thông báo dài. Không có đặc tả cơ chế phân trang trong bất kỳ tài liệu nào ban đầu — QA GiangDC2 xác nhận trực tiếp cơ chế infinite-scroll đúng như hành vi thật trên UI (2026-07-28) — xem **C-NTF-03 (Resolved)**.
+
+##### SC-NTF-010 — Nội dung push không chứa SĐT (kiểm soát lộ liên hệ) — NEW 2026-07-30
+**Source Quote:**
+> "OPR-07 Lộ liên hệ có kiểm soát — SĐT chỉ lộ sau khi ghép, chỉ cho đúng 2 người trong cặp; không đưa SĐT vào nội dung push"
+
+**Source Location:** `DOC-v1.0-01 §D7 "Rule vận hành (Operating Rules)" · row OPR-07`
+**Analyst Note:** Bổ sung theo yêu cầu user (2026-07-30) sau khi `/review-tc` phát hiện `REQ-NTF-002` chưa có scenario nào đại diện phần OPR-07 (trước đó `REQ-NTF-002` chỉ gắn `SC-NTF-006`, đã DEPRECATED — nhưng đó là sub-rule OPR-06 khác, không phải OPR-07). Test riêng biệt với `REQ-ASN-002`/`REQ-ASN-003` (SĐT lộ **TRONG APP**, ví dụ màn Chi tiết tin/Theo dõi đơn) — OPR-07 kiểm soát SĐT ở tầng **NỘI DUNG PUSH NOTIFICATION** (hiển thị trên lock-screen/notification-center của thiết bị), 2 bề mặt khác nhau dù cùng liên quan 1 dữ liệu (SĐT). Chưa có ảnh Figma/bằng chứng UI cho nội dung push thật — TC sẽ assert theo đúng RULE (không chứa SĐT), cần vibe-test xác nhận nội dung push thật trên thiết bị trước khi coi là final.
+
+##### SC-ORD-034, SC-ORD-035, SC-DLV-015, SC-GIFT-008, SC-NTF-011 — Icon quay lại (Back) — audit toàn dự án — NEW 2026-07-30
+**Source Quote:** — (không có bằng chứng tài liệu/Figma cho icon back của 5 màn này; xác nhận qua quan sát trực tiếp app STG).
+**Source Location:** Quan sát thực tế app STG (QA GiangDC2, chat 2026-07-30).
+**Analyst Note:** Phát sinh từ yêu cầu user "quét lại tất cả các sheet xem đã có TC cho icon Back của từng màn hình chưa". Kết quả audit: chỉ `SC-GIFT-007` (màn "Quà đã nhận") có TC do có bằng chứng ảnh Figma từ trước; 6 màn còn lại từng bị bỏ qua theo đúng `Project_rule.md §10.1` (không viết TC khi thiếu bằng chứng) — riêng Bảng tin (root tab, không có back) được loại khỏi danh sách vì không có gì để test. User xác nhận trực tiếp 5 màn còn lại (Chi tiết tin, Theo dõi đơn, Tặng quà, Thông báo, "Đăng tin mới") đều có icon quay lại hoạt động đúng → đủ bằng chứng (quan sát trực tiếp) để viết TC theo `Project_rule.md §10.1`. Cả 5 chỉ test 1 hành vi duy nhất (bấm icon → điều hướng đúng về màn nguồn), không có input/condition nào khác nên không áp dụng technique B1-B8 (log N/A trong Coverage Matrix). **Cập nhật (cùng ngày, user rà thêm màn Đăng tin):** phát hiện thêm gap tương tự riêng cho **Wizard đăng tin — Bước 1/3** — khác với nút "Quay lại" GIỮA các bước (`SC-ORD-006`/`SC-ORD-007`, đã có TC `TC_04.75`/`TC_04.76`), đây là icon thoát HẲN khỏi wizard ở Bước 1/3 về lại "Đăng tin mới", trước đó chưa từng được xét — bổ sung `SC-ORD-036`.
 
 ### TS — Trust & Safety / Admin
 

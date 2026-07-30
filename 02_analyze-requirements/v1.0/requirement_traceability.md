@@ -20,8 +20,8 @@
 ### Module ORD — DOC-v1.0-01
 | REQ ID | Maps (Ref DOC) | DOC §section | Scenarios | Clarification |
 |--------|----------------|--------------|-----------|---------------|
-| REQ-ORD-001 | ORD-01 | §D3 + DOC-v1.0-04 | SC-ORD-001, SC-ORD-002, SC-ORD-003 | C-ORD-05 |
-| REQ-ORD-002 | ORD-02 | §D3 | SC-ORD-001, SC-ORD-002, SC-ORD-007 | C-ORD-01 (Resolved, 2026-07-27) |
+| REQ-ORD-001 | ORD-01 | §D3 + DOC-v1.0-04 | SC-ORD-001, SC-ORD-002, SC-ORD-003, SC-ORD-034, SC-ORD-035 | C-ORD-05 |
+| REQ-ORD-002 | ORD-02 | §D3 | SC-ORD-001, SC-ORD-002, SC-ORD-007, SC-ORD-036 | C-ORD-01 (Resolved, 2026-07-27) |
 | REQ-ORD-003 | ORD-04 | §D3 | SC-ORD-004 | — |
 | REQ-ORD-004 | ORD-06, US-D04 | §D3, §D1b | SC-ORD-005 | C-ORD-03 (Resolved, 2026-07-27) |
 | REQ-ORD-005 | ORD-09 | §D3 | SC-ORD-006 | — |
@@ -30,11 +30,11 @@
 | REQ-ORD-008 | USR-EML, US-D18 | §D3, §D1b | SC-ORD-011, SC-ORD-012 | — |
 | REQ-ORD-009 | BR-ORD-03 | §D4 | SC-ORD-013 | C-ORD-02 (Resolved — Deferred, 2026-07-27) |
 | REQ-ORD-010 | BR-ORD-04 | §D4 | SC-ORD-014 | C-ORD-04 (Resolved, 2026-07-27) |
-| REQ-ORD-011 | Quan sát thực tế app (không có ID doc gốc) | — | SC-ORD-015..026 | — |
+| REQ-ORD-011 | DOC-v1.0-02 | §3.7 | SC-ORD-015..026 | — |
 | REQ-ORD-012 | D8.1/D8.2 (không có ID row riêng — BRD v3.2 mới) | §D8.1, §D8.2 | SC-ORD-013, SC-ORD-027, SC-ORD-028 | C-ORD-01 (Resolved đầy đủ, 2026-07-28) |
 | REQ-ORD-013 | VAL-01..05 | §D8.3 | SC-ORD-029, SC-ORD-030 | — |
-| REQ-ORD-014 | Quan sát thực tế app (không có ID doc gốc) | — | SC-ORD-031, SC-ORD-032 | — |
-| REQ-ORD-015 | Không có ID doc gốc (bảng "Thành phần chung", không đánh số) | §2, §3.1 | SC-ORD-033 | — |
+| REQ-ORD-014 | DOC-v1.0-06 | — | SC-ORD-031, SC-ORD-032 | — |
+| REQ-ORD-015 | DOC-v1.0-02 | DOC-v1.0-02 | SC-ORD-033 | — |
 
 ### Module ASN — DOC-v1.0-01
 | REQ ID | Maps (Ref DOC) | DOC §section | Scenarios | Clarification |
@@ -48,14 +48,14 @@
 | REQ-ASN-007 | OPR-04 | §D7 | SC-ASN-010 | — |
 | REQ-ASN-008 | OPR-05 | §D7 | SC-ASN-011 | C-ASN-02 (Resolved, 2026-07-27) |
 | REQ-ASN-009 | OPR-08 | §D7 | SC-ASN-005, SC-ASN-012 | — |
-| REQ-ASN-010 | Không có ID doc gốc (không đánh số) | §3.3 | SC-ASN-014 | — |
+| REQ-ASN-010 | DOC-v1.0-02 | DOC-v1.0-02 | SC-ASN-014 | — |
 
 ### Module DLV — DOC-v1.0-01
 | REQ ID | Maps (Ref DOC) | DOC §section | Scenarios | Clarification |
 |--------|----------------|--------------|-----------|---------------|
 | REQ-DLV-001 | PUP-03, BR-CNF-01 | §D3, §D4 | SC-DLV-001, SC-DLV-002 | — |
 | REQ-DLV-002 | GPS-01 | §D3 | SC-DLV-003, SC-DLV-004 | C-DLV-02 (Open — default deferred) |
-| REQ-DLV-003 | DLV-03, BR-CNF-04, BR-INT-03 | §D3, §D4, §A5 + DOC-v1.0-04 | SC-DLV-005, SC-DLV-006, SC-DLV-007, SC-DLV-011, SC-DLV-012, SC-DLV-013, SC-DLV-014 | C-DLV-01 (Resolved), C-DLV-03 (Resolved 2026-07-27) |
+| REQ-DLV-003 | DLV-03, BR-CNF-04, BR-INT-03 | §D3, §D4, §A5 + DOC-v1.0-04 | SC-DLV-005, SC-DLV-006, SC-DLV-007, SC-DLV-011, SC-DLV-012, SC-DLV-013, SC-DLV-014, SC-DLV-015 | C-DLV-01 (Resolved), C-DLV-03 (Resolved 2026-07-27) |
 | REQ-DLV-004 | COST-01, BR-COST-01 | §D3, §D4 | SC-DLV-008 | — |
 | REQ-DLV-005 | BR-ASN-03 | §D4 | SC-DLV-009 | C-CNL-01 (Resolved — Deferred, 2026-07-27) |
 | REQ-DLV-006 | US-D09 | §D1b | SC-DLV-010, SC-DLV-011 | — |
@@ -63,9 +63,9 @@
 ### Module GIFT — DOC-v1.0-01
 | REQ ID | Maps (Ref DOC) | DOC §section | Scenarios | Clarification |
 |--------|----------------|--------------|-----------|---------------|
-| REQ-GIFT-001 | GIFT-01, BR-GIFT-01 | §D3, §D4 | SC-GIFT-001, SC-GIFT-002, SC-GIFT-003, SC-GIFT-005, SC-GIFT-006, SC-GIFT-007 | C-ORD-06 (Resolved — QA xác nhận empty state text đúng UI thật, 2026-07-28) |
+| REQ-GIFT-001 | GIFT-01, BR-GIFT-01 | §D3, §D4 | SC-GIFT-001, SC-GIFT-002, SC-GIFT-003, SC-GIFT-005, SC-GIFT-006, SC-GIFT-007, SC-GIFT-008 | C-ORD-06 (Resolved — QA xác nhận empty state text đúng UI thật, 2026-07-28) |
 | REQ-GIFT-002 | RAT-01/02 | §D3 + DOC-v1.0-04 | — (Deferred — BA/PO xác nhận 2026-07-27: rating 1-5 sao là phase sau, out of scope v1.0) | C-GIFT-01 (Resolved — Deferred, 2026-07-27) |
-| REQ-GIFT-003 | — (Quan sát thực tế app STG, QA GiangDC2) | Quan sát thực tế app STG · 2026-07-24 | SC-GIFT-004 | — |
+| REQ-GIFT-003 | DOC-v1.0-04 + DOC-v1.0-05 | — | SC-GIFT-004 | — |
 
 ### Module CNL — DOC-v1.0-01
 | REQ ID | Maps (Ref DOC) | DOC §section | Scenarios | Clarification |
@@ -77,8 +77,8 @@
 ### Module NTF — DOC-v1.0-01
 | REQ ID | Maps (Ref DOC) | DOC §section | Scenarios | Clarification |
 |--------|----------------|--------------|-----------|---------------|
-| REQ-NTF-001 | NTF-01..09 | §D6 + DOC-v1.0-04 | SC-NTF-001, SC-NTF-002, SC-NTF-003, SC-NTF-004, SC-NTF-005, SC-NTF-007, SC-NTF-008, SC-NTF-009 | C-NTF-01 (Open — bảng unified 3 nguồn bổ sung 2026-07-27, chờ BA chọn); C-ORD-06 (Resolved — QA xác nhận empty state text đúng UI thật, mở rộng sang NTF, 2026-07-28); C-NTF-03 (Resolved — QA xác nhận cơ chế đánh dấu đã đọc + phân trang đúng UI thật, 2026-07-28) |
-| REQ-NTF-002 | OPR-06, OPR-07 | §D7 | SC-NTF-006 (DEPRECATED 2026-07-29 — không có ngưỡng ngày) | C-NTF-02 (Partially Resolved, 2026-07-27) |
+| REQ-NTF-001 | NTF-01..09 | §D6 + DOC-v1.0-04 | SC-NTF-001, SC-NTF-002, SC-NTF-003, SC-NTF-004, SC-NTF-005, SC-NTF-007, SC-NTF-008, SC-NTF-009, SC-NTF-011 | C-NTF-01 (Open — bảng unified 3 nguồn bổ sung 2026-07-27, chờ BA chọn); C-ORD-06 (Resolved — QA xác nhận empty state text đúng UI thật, mở rộng sang NTF, 2026-07-28); C-NTF-03 (Resolved — QA xác nhận cơ chế đánh dấu đã đọc + phân trang đúng UI thật, 2026-07-28) |
+| REQ-NTF-002 | OPR-06, OPR-07 | §D7 | SC-NTF-006 (DEPRECATED 2026-07-29 — OPR-06, không có ngưỡng ngày), SC-NTF-010 (NEW 2026-07-30 — OPR-07, nội dung push không chứa SĐT) | C-NTF-02 (Partially Resolved, 2026-07-27) |
 
 ### Module TS — DOC-v1.0-01
 | REQ ID | Maps (Ref DOC) | DOC §section | Scenarios | Clarification |
