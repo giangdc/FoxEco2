@@ -111,3 +111,56 @@ PM chốt phạm vi kiểm thử v1.0 (Phase 1) chỉ gồm 5 luồng chính:
 - Dùng UI nào cho màn xác nhận nhận hàng? → **Modal đơn giản** (theo Figma); form đầy đủ out of scope v1.0 (C-DLV-03: Resolved).
 
 **Còn Open thực sự (chưa có câu trả lời):** `C-ORD-05` (biến thể "Mã tin"), `C-NTF-01` (danh sách thông báo chính thức — đã có bảng unified 3 nguồn ở `MEMORY.md §6.1` chờ BA chọn), `C-DLV-02` (default bật/tắt chia sẻ vị trí), maxlength cụ thể của `C-ORD-01`.
+
+## Jira Integration
+> Khám phá + xác nhận 2026-08-04 qua Atlassian MCP (`getVisibleJiraProjects` → `getJiraProjectIssueTypesMetadata`
+> → `getJiraIssueTypeMetaWithFields` → `getTransitionsForJiraIssue` trên issue thật FE-146/FE-131) +
+> đối chiếu 49 bug Bug-type đã có sẵn trong project (dự án LIVE, team đã dùng thật — KHÔNG phải sandbox).
+qc_name:         GiangDC2
+site:            https://foxproject.atlassian.net
+cloud_id:        f192baca-4acd-46c2-8d8d-ce0d4e636d4e
+project_key:     FE
+issue_type:      Bug          # id 10293
+reporter:                     # để trống = tài khoản auth (giangdc2@fpt.com)
+parent_epic:     FE-1         # "[FoxEco] Triển khai Phase 1 - Nền tảng chung & Gửi hàng (MVP)" — user xác nhận 2026-08-04: LUÔN gắn, khớp 100% 49 bug hiện có
+fix_version:     10518        # tên "V1.0", khớp affects_versions: [v1.0]
+priority_map:    P1=Highest, P2=High, P3=Medium, P4=Low   # khớp đúng tên trong Jira (không cần đổi), §7 file này
+required_fields:               # KHÔNG có custom field nào bắt buộc thật — create-meta chỉ ép issuetype/project/reporter/summary (system field, skill tự set)
+recommended_fields:            # cascading select — value dạng {"value": "..."} khi build additional_fields
+  - customfield_10678: "{severity_code}"   # Severity — value = SỐ dạng string, allowedValues: 0/2/5/10/20 (khớp map Critical=20·Major=10·Medium=5·Low=2 sẵn có trong log.md; "0" chưa rõ nhãn tương ứng, không dùng)
+  - customfield_10679: "{round_found}"     # Test Round — value = SỐ dạng string "1".."7", lấy trực tiếp round_found
+  - customfield_10681: "Android, iOS"      # Platform — user xác nhận 2026-08-04: LUÔN dùng giá trị gộp này (khớp convention team, dù QA hiện chỉ test Android qua Appium MCP) — field KHÔNG có option "Mobile" riêng
+  - customfield_10682: "{effect}"          # Effect — value trùng tên trực tiếp với effect front-matter (Functionality/Performance/Security/Serviceability/Usability)
+  - customfield_10685: "{defect}"          # Defect Type — value trùng tên trực tiếp với defect front-matter (Data/Interface/Logic/Server/Other); Jira có thêm option "Requirement" chưa dùng trong md enum
+  # customfield_10683 (Test method) để mặc định "Manual" (defaultValue có sẵn) — vibe-test là AI-assisted exploratory, gần Manual hơn Auto
+  # customfield_11055 (Duplicate) để mặc định "No"
+status_map:      New=To Do, InProgress=In Progress, Fixed=In review, Verified=Done, Closed=Done
+                 # workflow thật (xác nhận qua getTransitionsForJiraIssue trên FE-131, status "In review"):
+                 # To Do → In Progress → In review → (QC Accept) → Done  |  (QC Reject) → về In Progress
+                 # Any status → "To cancel" → Cancel (Done-category, dùng cho Won't Fix) | → "Pending" → Pending (Done-category, dùng khi blocked)
+description_extra: [Environment, Version, Module, Traceability]
+match_jql:       project = {project_key} AND labels = "{bug_id_lower}"
+                 # ⚠ KHÔNG dùng summary ~ "{bug_id}" (default schema) — team KHÔNG đặt "BUG-NNN" trong Summary,
+                 # convention thật của team: Summary = "[TC_XX - Tên module]: <mô tả ngắn>" (vd
+                 # "[TC_03 - Thông báo ]: Gởi cùng lúc 2 thông báo cảm ơn..."), Description dạng
+                 # "Điều kiện test:/Step:/Actual:/=> Bug:/KQMM:". Khi push-jira thật chạy: (1) build Summary
+                 # theo đúng format trên (lấy TC ID đầu tiên trong labels + Module từ components[0]), KHÔNG
+                 # dùng format "[BUG-NNN] title" mặc định của push-jira.md, để khớp UI Jira team đang nhìn;
+                 # (2) vẫn thêm 1 label riêng `bug-nnn` (lowercase, vd "bug-003") — KHÔNG hiện trên UI chính,
+                 # chỉ dùng để match_jql pull ngược đúng issue.
+notes:
+  - "49 bug Bug-type hiện có trong FE, status thật: To Do=27 · In Progress=9 · In review=13, chưa có Done nào."
+  - "Assignee mặc định do Jira/automation project tự set (quan sát: hầu hết về Tuanvm37) — log-bug KHÔNG tự set assignee, để trống khi create."
+  - "Có vài custom field khác (customfield_10825='ISC', customfield_10787/10972='Normal') xuất hiện trên issue thật nhưng KHÔNG có trong create-meta (getJiraIssueTypeMetaWithFields) — nhiều khả năng do Jira Automation rule tự điền SAU khi tạo, KHÔNG cần set thủ công lúc create."
+userstory:                       # sub-section riêng cho fetch-us — CHƯA xác nhận, để nguyên default
+  issue_types:   [Story]
+  jql_template:  project = {project_key} AND issuetype in ({issue_types}) AND fixVersion = "{version}" ORDER BY key ASC
+  link_handling:
+    figma:   record
+    gsheets: read_text
+    gdocs:   read_text
+    gdrive:
+      enabled: true
+    other:   record
+  attachment_download:
+    env_file: ~/.config/jira/.env
