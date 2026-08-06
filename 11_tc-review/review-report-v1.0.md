@@ -1,5 +1,132 @@
 # TC Review Report — v1.0
 
+> ## 🔁 ROUND 3 — RECHECK 2026-07-30 (`/review-tc --recheck`, scope 337 TC)
+>
+> **Mode: Direct** (⚠ vẫn self-review — `review-agent/AGENT.md` vẫn không tồn tại, cap 85 giữ nguyên). Parse `openpyxl` trên bản LibreOffice-recalc, đối chiếu song song formula-view, trên cả 3 file chính (`TC-MASTER-v1.0.xlsx`, ISC alias, `TC-MASTER-LATEST.xlsx`).
+>
+> ### Re-check 3 finding của ROUND 2
+>
+> | Finding | Round 2 | Round 3 (bây giờ) | Trạng thái |
+> |---|---|---|---|
+> | N1 (Major) — Dashboard/Summary báo sai 100% đã chạy | `COUNTIFS(...,"<>")` sai | Vẫn dùng công thức cũ (`Dashboard!AB4` sai), `L34`(Executed thật)=0 nhưng `AB34+AC34+AD34`≈335/337 | 🔴 **Still Open** — chưa ai sửa formula |
+> | N2 (Minor) — RTM thiếu 5/46 Req ID | 5 ID thiếu | Vẫn đúng 5 ID cũ thiếu: `REQ-ASN-006`, `REQ-GIFT-002`, `REQ-TS-001`, `REQ-TS-002`, `REQ-USR-001` (RTM 41/46) | 🔴 **Still Open** — không đổi |
+> | N3 (Minor) — `TC-MASTER-LATEST.xlsx` lệch tên tab | Tên tab cũ (`Test Cases`...) | Vẫn giữ tên tab cũ — mọi lần sửa TC hôm nay đều ghi content vào đúng sheet theo tên cũ này (đồng bộ nội dung/số TC, KHÔNG đồng bộ tên tab) | 🔴 **Still Open** — không đổi |
+>
+> **0/3 Fixed.** Không có ai chủ động sửa 3 finding này kể từ ROUND 2 — phiên làm việc hôm nay tập trung bổ sung TC mới (coverage), không đụng tới Dashboard/RTM/tab-rename.
+>
+> ### 2 bug MỚI phát sinh trong phiên này — đã tự phát hiện và tự sửa xong trước khi recheck
+>
+> | Bug | Root cause | Trạng thái |
+> |---|---|---|
+> | Mất 7 nhãn Block ở sheet Đăng tin (`"Wizard đăng tin — Bước 1/3"`...) | Script chèn `TC_04.4` dùng chung hàm dọn công thức ID, hàm này mặc định nhãn Block nằm ở cột B — nhưng 7 divider của Đăng tin lưu nhãn ở cột A, bị ghi đè thành rỗng | ✅ Fixed cùng ngày (khôi phục từ git history), user tự phát hiện qua quan sát trực tiếp |
+> | Mất hẳn 1 TC (`TC_04.111` cũ, case "khoá chỉnh sửa khi Đã huỷ/CANCELLED") | Row-rotate dùng sai giá trị "dòng cuối" (chưa cập nhật sau lần chèn trước) khi chèn `TC_04.5` mới, đè mất dòng cuối cùng | ✅ Fixed cùng ngày (khôi phục nguyên văn thành `TC_04.112`), tự phát hiện qua đếm lại TC thực tế |
+>
+> Cả 2 bug đều **đã đóng trước khi chạy recheck này** — không tính vào score Round 3, chỉ ghi nhận làm bằng chứng đã qua kiểm tra kỹ trước khi báo cáo.
+>
+> ### Sweep cơ học fresh trên 337 TC / 9 sheet (không chỉ verify 3 finding cũ)
+>
+> - **R1 (16 check, toàn bộ 337 TC × 9 sheet, cả 3 file chính):** 0 finding — 0 ID trùng/nhảy số, 0 thiếu field bắt buộc, 0 sai enum Priority/Group, 0 lệch Steps↔Expected.
+> - **0 lỗi công thức** ở bất kỳ đâu trong cả 3 workbook đã recalc.
+> - **9/9 Coverage Matrix** (× 3 file): footer khớp đúng số TC thật từng sheet, kể cả các sheet vừa thêm TC hôm nay (Huỷ đơn 28, Thông báo 30, Hoạt động 21, Trang chủ 33, Đăng tin 112, Bảng tin & Chi tiết tin 34, Theo dõi đơn 45, Tặng quà 17).
+> - **14 TC mới thêm trong phiên** (323→337): mỗi TC đã được verify LibreOffice-recalc riêng lẻ ngay lúc tạo (ID liên tục, 0 lỗi công thức) — recheck lần này xác nhận lại không có regression nào phát sinh từ các thao tác chèn/dịch dòng liên tiếp.
+>
+> ### Score Breakdown (Round 3 — không đổi so với Round 2 vì cả 3 finding cũ đều Still Open, không phát sinh Critical/Major/Minor mới)
+>
+> ```
+> Score = 100 - (CRITICAL×5 + MAJOR×3 + MINOR×1)
+>       = 100 - (0×5 + 1×3 + 2×1)
+>       = 100 - 5
+>       = 95 → cap Direct-mode 85 → 85
+> ```
+>
+> | | |
+> |---|---|
+> | **Score** | **85/100 — CONDITIONAL** (không đổi so với Round 2) |
+> | **Quality Gate G1** | **PASS** (≥70) |
+> | So với Round 2 (323 TC) | +14 TC mới, 0 regression, nhưng 3 finding cũ (N1/N2/N3) vẫn chưa ai sửa → điểm giữ nguyên 85 |
+>
+> ### Recommendations
+> 1. **Vẫn ưu tiên fix N1** (Major, rủi ro cao nhất) — đổi `Dashboard!AB4:AD33` sang pattern `SUMPRODUCT` đã dùng ở `RTM!F`.
+> 2. N3 rẻ nhất — copy lại `TC-MASTER-v1.0.xlsx` đè lên `TC-MASTER-LATEST.xlsx` để đồng bộ tên tab (cẩn thận: sẽ mất tính năng "alias giữ tên riêng" nếu có ai đang dựa vào tên tab cũ).
+> 3. N2 — thêm 5 row 0-TC vào RTM cho đủ 46/46 Req ID.
+> 4. Muốn điểm độc lập thật (thoát cap 85): bổ sung `~/.claude/skills/review-tc/review-agent/AGENT.md` rồi chạy `/review-tc --recheck` lần nữa.
+>
+> ---
+
+> ## 🔁 ROUND 2 — FULL RE-REVIEW 2026-07-30 (điểm chính thức sau fix, thay cho placeholder "chờ `/review-tc --recheck`" ở Update 4 bên dưới)
+>
+> **Mode: Direct** (⚠ vẫn self-review — `~/.claude/skills/review-tc/review-agent/AGENT.md` vẫn KHÔNG tồn tại, cap 85 giữ nguyên). **Scope: 323 TC / 9 sheet**, parse bằng `openpyxl` trên bản copy đã LibreOffice-headless-recalc (không đọc cache cũ), đối chiếu formula-view song song để phát hiện giá trị gõ đè.
+>
+> ### Phần A — Verify 12/12 finding đã báo Fixed ở Update 4 (đối chiếu trực tiếp nội dung cell, không đọc lại changelog)
+>
+> | Finding | Kết quả verify |
+> |---|---|
+> | M1 (`TC_02.16`/`TC_02.17`) | ✅ **Fixed, confirmed** — 2 TC tồn tại đúng vị trí, Remark có đủ cảnh báo "⚠ chỉ có bằng chứng văn bản US-D20 … cần vibe-test" |
+> | M2 (`TC_03.1/2/3` Remark) | ✅ **Fixed, confirmed** — Remark nay đúng "trần 5 thông báo/tin OFFER … BA xác nhận 2026-07-29", hết mọi tham chiếu `C-NTF-02`/"3 mock" |
+> | m1 (`SC-NTF-006` row) | ✅ **Fixed, confirmed** — row đã bị xoá khỏi `Coverage Matrix - Thông báo` |
+> | m2 (`SC-ASN-013` row) | ✅ **Fixed, confirmed** — row có mặt (3 TC, B2 BVA) tại đúng matrix |
+> | m3 (footer Trang chủ) | ✅ **Fixed, confirmed** — "Total TCs derived: 32", khớp 32 TC thật |
+> | m4 (`SC-ORD-004/005` gộp) | ✅ **Fixed, confirmed** — tách thành 2 row riêng ở `Coverage Matrix - Đăng tin`, note `SC-ORD-005` đã đúng "0 TC tại module này — cover tại TC-HOATDONG" |
+> | m5 (`VAL-02` tag) | ✅ **Fixed, confirmed** — `TC_04.81`/`TC_04.82` Remark nay "Technique: N/A — baseline …, không thuộc rubric B1–B8" |
+> | m6 (`TC_04.93` Expected) | ✅ **Fixed, confirmed** — Expected bước 1/3 nêu rõ giá trị cụ thể |
+> | m7 (`TC_04.106` Expected) | ✅ **Fixed, confirmed** — Expected bước 1 nêu rõ trường cần thấy |
+> | m8 (`TC_03.8`/`TC_03.10`) | ✅ **Fixed, confirmed** — 2 TC viết lại chỉ assert vế thông báo, DOC Source đổi đúng nguồn |
+> | m9 (4 ID TC dự kiến FAIL) | ✅ **Fixed, confirmed** — `MASTER-MEMORY.md` §8 hiện ghi đúng `TC_08.7`/`TC_08.10`/`TC_08.22`/`TC_08.23` |
+> | m10 (DOC Source vocabulary) | ✅ **Fixed, confirmed** — quét toàn bộ 323 TC: 0 instance nhãn cũ ("Chờ BA bổ sung", "chưa chốt số") còn sót |
+>
+> **0/12 Still Open, 0 regression.** Toàn bộ 12 finding của Update 4 đóng thật, không phải chỉ ghi log.
+>
+> ### Phần B — Sweep cơ học fresh trên 323 TC (không chỉ verify finding cũ)
+>
+> - **R1 (16 check, toàn bộ 323 TC × 9 sheet):** 0 finding — 0 ID trùng, 0 nhảy số/gap sequence, 0 thiếu Req ID/DOC Source/Title/Precondition/Steps/Expected, 0 Priority/Group sai enum, 0 lệch số bước Steps↔Expected.
+> - **0 lỗi công thức** (`#REF!`/`#VALUE!`/…) ở BẤT KỲ đâu trong toàn bộ workbook đã recalc.
+> - **9/9 Coverage Matrix**: footer "Total TCs derived" đối chiếu số TC thật từng sheet — khớp 100% (kể cả 3 matrix vừa fix ở Update 4).
+> - **DOC Source vocabulary:** 0 nhãn cũ còn sót (xem Phần A · m10).
+>
+> ### Phần C — 3 finding MỚI (phát hiện qua cross-check sâu hơn giữa TC sheet ↔ Dashboard ↔ RTM ↔ 3 file alias, nằm ngoài phạm vi 12 finding cũ)
+>
+> #### 🟠 MAJOR — N1: Dashboard + Summary báo SAI 100% test đã chạy — là **regression của bug đã từng fix một lần** (không phải lỗi mới hoàn toàn)
+> - **Sheet:** `Dashboard` cột `AB`/`AC`/`AD` ("High/Medium/Low đã chạy", row 4-34) → `Summary` E19:E22 + F19:F22 ("Đã chạy" / "% đã chạy")
+> - **Issue:** Công thức dùng `COUNTIFS(INDIRECT(...!$E$7:$E$500),"High",INDIRECT(...!$AO$7:$AO$500),"<>")` — chuỗi tiêu chí `"<>"` của `COUNTIFS` đếm MỌI ô có công thức (kể cả công thức trả về `""`) là "non-blank", nên đếm nhầm **toàn bộ 323 TC** là "đã chạy" dù chưa TC nào được execute (`vibe-test` = NOT_STARTED theo `PIPELINE.md`). Bằng chứng đối chứng ngay trong cùng workbook: `Dashboard!L34` ("Executed", tính đúng bằng `G+H+I+J`) = **0**, `Dashboard!K34` ("Chưa chạy") = **323**, nhưng `AB34+AC34+AD34` = `45+187+91` = **323** (100%) — hai chỉ số trên CÙNG MỘT ROW mâu thuẫn trực tiếp nhau. `Summary!C19:C22` ("Đã chạy") = `45/187/91/323`, `% đã chạy` = **100%** cho cả 3 mức ưu tiên.
+> - **Đây là regression:** đúng bug-class đã bị bắt và fix một lần ở `03_test-cases/v1.0/CHANGELOG.md` dòng 2026-07-29 — khi đó `RTM` cột F "Đã chạy" bị đúng lỗi này (`COUNTIFS(...,"<>")` báo sai 192/192=100%) và đã được sửa sang `SUMPRODUCT(ISNUMBER(SEARCH(...))*(AO<>""))` (so sánh trực tiếp chuỗi rỗng, không dùng criteria-string `"<>"` của COUNTIFS/COUNTIF — 2 cơ chế cho kết quả khác nhau với ô công thức-rỗng). Đối chứng ngay trong file hiện tại: `RTM!F6` dùng đúng pattern `SUMPRODUCT` đã fix → trả về **0** (đúng); `Dashboard!AB4` dùng lại pattern `COUNTIFS(...,"<>")` cũ → trả về **45** (sai). Khi consolidate 9/9 module ngày 2026-07-30, Dashboard được viết lại 9 dòng mới nhưng cột AB/AC/AD không được áp lại fix đã có ở RTM — **fix trước KHÔNG được propagate sang sheet Dashboard**.
+> - **Hệ quả:** `Summary` là tab đầu tiên PM/stakeholder thường xem — hiện báo "100% đã chạy" trong khi thực tế 0% (đúng theo pipeline status), có thể dẫn tới quyết định GO/NO-GO sai nếu không đối chiếu chéo với Dashboard cột L/K.
+> - **Suggestion:** đổi công thức `Dashboard!AB4:AD33` từ `COUNTIFS(...,"<>")` sang cùng pattern `SUMPRODUCT` đã dùng ở `RTM!F` (vd `SUMPRODUCT((INDIRECT(range_E)="High")*(INDIRECT(range_AO)<>""))`), rồi verify lại `Summary!E19:E22` = 0 cho tới khi `vibe-test` thực sự chạy.
+>
+> #### 🟡 MINOR — N2: RTM thiếu hẳn 5/46 Req ID (không hiển thị row, trái với chính governing note của sheet)
+> - **Sheet:** `RTM` — dòng ghi chú của chính sheet: *"Yêu cầu có Số TC = 0 → tô đỏ = LỖ HỔNG PHỦ (gap)"* — nghĩa là MỌI requirement, kể cả 0 TC, phải có 1 row (tô đỏ để cảnh báo).
+> - **Issue:** Đối chiếu toàn bộ 46 Req ID trong `requirement_traceability.md` với 41 Req ID thực có trong `RTM`: **5 Req ID hoàn toàn không có row nào** — `REQ-ASN-006`, `REQ-GIFT-002`, `REQ-TS-001`, `REQ-TS-002`, `REQ-USR-001`. Cả 5 đều có lý do out-of-scope/deferred đã ghi trong `MEMORY.md` (auto-match Phase 1, rating sao `C-GIFT-01`, Admin/Trust&Safety `C-TS-01`, SSO thuộc host app) — KHÔNG phải gap coverage thật — nhưng RTM lại ÂM THẦM bỏ qua thay vì hiển thị 0 TC + tô đỏ như chính sheet tự cam kết.
+> - **Hệ quả:** Ai chỉ đọc `RTM` (không cross-check `MEMORY.md`) sẽ tưởng project chỉ có 41 requirement thay vì 46 — thiếu 11% requirement scope khỏi bức tranh traceability.
+> - **Suggestion:** Thêm 5 row còn thiếu vào RTM (Số TC = 0, tô đỏ theo conditional formatting sẵn có `B6:J46`), Ghi chú cột dẫn thẳng tới lý do trong `MEMORY.md §6` để không cần thêm cross-check thủ công.
+>
+> #### 🟡 MINOR — N3: `TC-MASTER-LATEST.xlsx` lệch khỏi 2 file chính (vi phạm cam kết "3 file byte-identical" của chính project)
+> - **File:** `03_test-cases/TC-MASTER-LATEST.xlsx` (md5 `02f2a06bba65`) so với `03_test-cases/v1.0/ISC_FoxEco_v1.0_TC_v1_R1.xlsx` + `TC-MASTER-v1.0.xlsx` (2 file này byte-identical, md5 `1604bb8aff44`).
+> - **Issue:** Commit gần nhất (`3be4b01`, "Rename test-case sheet tabs to match module name") chỉ cập nhật 2 file chính + 9 fragment, **không đụng tới `TC-MASTER-LATEST.xlsx`** — file này vẫn giữ tên tab cũ (`Test Cases`, `Test Case 2`…`Test Case 9`) trong khi 2 file kia đã đổi sang tên tab tiếng Việt theo module (`Hoạt động`, `Cá nhân`, …`Tặng quà`). Nội dung TC bên trong giống hệt nhau (cùng 323 TC, cùng data) — không mất dữ liệu, chỉ lệch tên tab hiển thị.
+> - **Hệ quả:** Bất kỳ ai mở `TC-MASTER-LATEST.xlsx` (đúng như tên file gợi ý "bản mới nhất") sẽ thấy tên tab KHÔNG khớp với 2 file kia hay với `MASTER-MEMORY.md`/`Dashboard` (vốn đã ghi tên tab mới) — gây nhầm lẫn khi tra cứu chéo.
+> - **Suggestion:** Copy đè `TC-MASTER-LATEST.xlsx` từ `TC-MASTER-v1.0.xlsx` (hoặc chạy lại bước rename cho cả 3 file, không chỉ 2) để khôi phục tính chất "3 file byte-identical".
+>
+> ### Score Breakdown (Round 2 — chỉ tính finding CÒN MỞ tại thời điểm review này, không cộng dồn 12 finding đã đóng ở Update 4)
+>
+> ```
+> Score = 100 - (CRITICAL×5 + MAJOR×3 + MINOR×1)
+>       = 100 - (0×5 + 1×3 + 2×1)
+>       = 100 - 5
+>       = 95 → cap Direct-mode 85 → 85
+> ```
+>
+> | | |
+> |---|---|
+> | **Score** | **85/100 — CONDITIONAL** (cap Direct-mode áp dụng — raw 95 vượt cap) |
+> | **Quality Gate G1** | **PASS** (≥70) |
+> | So với Update 4 (raw ước tính ~100 trước cap) | Cùng ở mức CONDITIONAL vì cap, nhưng đây là điểm CHÍNH THỨC đầu tiên sau khi verify thật (không phải self-estimate) |
+>
+> ### Recommendations — thứ tự nên làm
+> 1. **Fix N1 trước tiên** (Major, rủi ro cao nhất — ảnh hưởng số liệu stakeholder-facing): áp lại pattern `SUMPRODUCT` đã dùng ở RTM cho `Dashboard!AB4:AD33`.
+> 2. Fix N3 (rẻ, 1 lệnh copy file) để khôi phục cam kết alias.
+> 3. Fix N2 khi có dịp sửa RTM tiếp theo (bổ sung 5 row 0-TC).
+> 4. Muốn điểm độc lập thật (không cap 85): bổ sung `~/.claude/skills/review-tc/review-agent/AGENT.md` rồi chạy `/review-tc --recheck` một lần nữa.
+>
+> ---
+
 > ## ✅ UPDATE 2026-07-30 — ĐÃ FIX TOÀN BỘ 12 FINDING (2 MAJOR + 10 MINOR)
 > User yêu cầu fix hết. Đã sửa ở **fragment** rồi consolidate lại (đúng flow `generate-tc`), **không sửa tay vào TC-MASTER**.
 > **TC: 321 → 323** (+2 TC đóng gap M1). Verify sau fix: LibreOffice recalc — Dashboard TOTAL **323** · Summary C17 323 · C12 = 9 sheet · High 45 / Medium 187 / Low 91 (=323) · ID liên tục `TC_01.1`→`TC_09.16` (Cá nhân giờ tới `TC_02.17`) · **R1 lại sạch 17/17, 0 finding cơ học** · 9/9 Coverage Matrix có `rowsum == footer == số TC thật` · RTM 41 Req, `SUM(E6:E46)`=357, 1 gap chủ đích `REQ-NTF-002`. 3 file output byte-identical (md5 `02f2a06bba65`).

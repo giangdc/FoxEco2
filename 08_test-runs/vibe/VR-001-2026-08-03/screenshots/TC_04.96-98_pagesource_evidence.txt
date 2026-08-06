@@ -1,0 +1,21 @@
+Evidence cho TC_04.96/97/98 (Điểm xuất phát boundary max-1/max/max+1) — capture qua
+appium_get_page_source thay vì screenshot (giá trị chính xác ký tự cần verify bằng text length,
+screenshot không đủ tin cậy để đếm ký tự).
+
+== TC_04.96 — nhập 199 ký tự ==
+appium_get_page_source (call #6 trong mcp-session-log.md)
+EditText hint="Bạn đang ở đâu / xuất phát từ đâu" max-text-length="200"
+text len = 199 (khớp input, không bị cắt)
+=> PASS
+
+== TC_04.97 — nhập 200 ký tự (đúng biên max) ==
+appium_get_page_source (call #7)
+Cùng EditText, max-text-length="200"
+text len = 200 (khớp input, không bị cắt)
+=> PASS
+
+== TC_04.98 — nhập 201 ký tự (vượt biên) ==
+appium_get_page_source (call #8)
+Cùng EditText, max-text-length="200"
+text len = 200 (input 201 ký tự bị cắt còn đúng 200 — ký tự cuối "g" bị chặn không nhập được)
+=> PASS (bị chặn đúng theo maxlength, không có message lỗi riêng nhưng hành vi chặn nhập đúng)

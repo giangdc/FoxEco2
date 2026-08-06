@@ -4,3 +4,4 @@ __MACOSX/
 .claude/worktrees/
 *.tmp
 ~$*
+*.local.md
